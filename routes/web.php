@@ -35,6 +35,13 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/employees', [UserController::class, 'index'])
         ->name('admin.employees');
 
+ Route::get('/employees/create', [UserController::class, 'create'])
+    ->name('admin.employees.create');
+
+Route::post('/employees', [UserController::class, 'store'])
+    ->name('admin.employees.store');
+
 });
 
+    
 require __DIR__.'/auth.php';
