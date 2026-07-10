@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\Admin\VehicleController;
+
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -49,6 +51,15 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 
     Route::delete('/employees/{user}', [UserController::class, 'destroy'])
         ->name('admin.employees.destroy');
+
+    Route::get('/vehicles', [VehicleController::class, 'index'])
+        ->name('admin.vehicles');
+
+    Route::get('/vehicles/create', [VehicleController::class, 'create'])
+        ->name('admin.vehicles.create');
+
+    Route::post('/vehicles', [VehicleController::class, 'store'])
+        ->name('admin.vehicles.store');
 });
 
     
