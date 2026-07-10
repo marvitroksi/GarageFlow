@@ -35,12 +35,20 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/employees', [UserController::class, 'index'])
         ->name('admin.employees');
 
- Route::get('/employees/create', [UserController::class, 'create'])
-    ->name('admin.employees.create');
+    Route::get('/employees/create', [UserController::class, 'create'])
+        ->name('admin.employees.create');
 
-Route::post('/employees', [UserController::class, 'store'])
-    ->name('admin.employees.store');
+    Route::post('/employees', [UserController::class, 'store'])
+        ->name('admin.employees.store');
 
+    Route::get('/employees/{user}/edit', [UserController::class, 'edit'])
+        ->name('admin.employees.edit');
+
+    Route::put('/employees/{user}', [UserController::class, 'update'])
+        ->name('admin.employees.update');    
+
+    Route::delete('/employees/{user}', [UserController::class, 'destroy'])
+        ->name('admin.employees.destroy');
 });
 
     

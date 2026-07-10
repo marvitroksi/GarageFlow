@@ -43,5 +43,40 @@ class UserController extends Controller
 
 
         return redirect()->route('admin.employees');
+
+    }
+    
+    public function edit(User $user)
+    {
+        return Inertia::render('Admin/EditEmployee', [
+            'mechanic' => $user
+        ]);
+    }
+
+    public function update(Request $request, User $user)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+        ]);
+
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+        ]);
+
+        if ($request->password) {
+            $user->update([
+                'password' => Hash::make($request->password),
+            ]);
+        }
+
+        return redirect()->route('admin.employees');
+    }
+    public function destroy(User $user)
+    {
+        $user->delete();
+
+        return redirect()->route('admin.employees');
     }
 }
