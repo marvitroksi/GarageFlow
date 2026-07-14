@@ -1,9 +1,20 @@
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { Pencil, Trash2 } from 'lucide-react';
 
 export default function Vehicles({ vehicles }) {
+
+    function handleDelete(id) {
+
+        if(confirm('Are you sure you want to delete this vehicle?')) {
+
+            router.delete(`/admin/vehicles/${id}`);
+
+        }
+
+    }
     return (
+
         <AdminLayout>
 
             <div className="flex justify-between items-center mb-6">
@@ -29,7 +40,20 @@ export default function Vehicles({ vehicles }) {
 
                 {vehicles.length === 0 ? (
 
-                    <p>No vehicles found.</p>
+                    <div className="text-center py-10">
+
+                        <p className="text-gray-500 text-lg mb-4">
+                            No vehicles found.
+                        </p>
+
+                        <Link
+                             href="/admin/vehicles/create"
+                            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                        >
+                                Add your first vehicle
+                        </Link>
+
+                    </div>
 
                 ) : (
 
@@ -79,8 +103,16 @@ export default function Vehicles({ vehicles }) {
 
                                         <td className="py-3 px-4">
 
-                                            <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm">
-                                                Waiting
+                                            <span
+                                                className={`px-3 py-1 rounded-full text-sm font-medium ${
+                                                    vehicle.status === 'waiting'
+                                                        ? 'bg-yellow-100 text-yellow-700'
+                                                        : vehicle.status === 'repairing'
+                                                        ? 'bg-blue-100 text-blue-700'
+                                                        : 'bg-green-100 text-green-700'
+                                                    }`}
+                                            >
+                                                {vehicle.status.charAt(0).toUpperCase() + vehicle.status.slice(1)}
                                             </span>
 
                                         </td>
@@ -89,15 +121,29 @@ export default function Vehicles({ vehicles }) {
 
                                             <div className="flex justify-center items-center gap-4">
 
-                                                <button
+                                                {/*<Link
+                                                    href={`/admin/vehicles/${vehicle.id}/edit`}
                                                     className="text-blue-600 hover:text-blue-800"
+                                                    title="Edit vehicle"
+                                                >*/}
+
+                                                <Link
+                                                    href={`/admin/vehicles/${vehicle.id}/edit`}
+                                                    className="p-2 rounded hover:bg-blue-100 text-blue-600"
                                                     title="Edit vehicle"
                                                 >
                                                     <Pencil size={18} />
-                                                </button>
+                                                </Link>
+                                                
 
-                                                <button
+                                                {/*<button
+                                                    onClick={() => handleDelete(vehicle.id)}
                                                     className="text-red-600 hover:text-red-800"
+                                                    title="Delete vehicle"
+                                                >*/}
+                                                <button
+                                                    onClick={() => handleDelete(vehicle.id)}
+                                                    className="p-2 rounded hover:bg-red-100 text-red-600"
                                                     title="Delete vehicle"
                                                 >
                                                     <Trash2 size={18} />

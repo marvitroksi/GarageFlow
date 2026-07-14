@@ -1,94 +1,77 @@
 import AdminLayout from '@/Layouts/AdminLayout';
 import { useForm } from '@inertiajs/react';
 
+export default function EditVehicle({ vehicle, mechanics }) {
 
-export default function CreateVehicle({ mechanics }) {
+    const { data, setData, put, processing } = useForm({
 
-
-    const { data, setData, post, processing } = useForm({
-
-        license_plate: '',
-        brand: '',
-        model: '',
-        year: '',
-        owner_name: '',
-        mechanic_id: '',
-        status: 'waiting',
+        license_plate: vehicle.license_plate,
+        brand: vehicle.brand,
+        model: vehicle.model,
+        year: vehicle.year,
+        owner_name: vehicle.owner_name,
+        mechanic_id: vehicle.mechanic_id,
+        status: vehicle.status,
 
     });
 
-
-
-    function submit(e){
+    function submit(e) {
 
         e.preventDefault();
 
-        post('/admin/vehicles');
+        put(`/admin/vehicles/${vehicle.id}`);
 
     }
-
 
     return (
 
         <AdminLayout>
 
             <h1 className="text-3xl font-bold mb-6">
-                Add Vehicle
+                Edit Vehicle
             </h1>
-
 
             <div className="bg-white p-6 rounded-lg shadow max-w-xl">
 
-
                 <form onSubmit={submit}>
 
+                    <input
+                        className="w-full border p-2 mb-4"
+                        value={data.license_plate}
+                        onChange={e => setData('license_plate', e.target.value)}
+                    />
 
                     <input
                         className="w-full border p-2 mb-4"
-                        placeholder="License Plate"
-                        onChange={e=>setData('license_plate',e.target.value)}
+                        value={data.brand}
+                        onChange={e => setData('brand', e.target.value)}
                     />
-
 
                     <input
                         className="w-full border p-2 mb-4"
-                        placeholder="Brand"
-                        onChange={e=>setData('brand',e.target.value)}
+                        value={data.model}
+                        onChange={e => setData('model', e.target.value)}
                     />
-
 
                     <input
                         className="w-full border p-2 mb-4"
-                        placeholder="Model"
-                        onChange={e=>setData('model',e.target.value)}
+                        value={data.year}
+                        onChange={e => setData('year', e.target.value)}
                     />
-
 
                     <input
                         className="w-full border p-2 mb-4"
-                        placeholder="Year"
-                        onChange={e=>setData('year',e.target.value)}
+                        value={data.owner_name}
+                        onChange={e => setData('owner_name', e.target.value)}
                     />
-
-
-                    <input
-                        className="w-full border p-2 mb-4"
-                        placeholder="Owner Name"
-                        onChange={e=>setData('owner_name',e.target.value)}
-                    />
-
 
                     <select
                         className="w-full border p-2 mb-4"
-                        onChange={e=>setData('mechanic_id',e.target.value)}
+                        value={data.mechanic_id}
+                        onChange={e => setData('mechanic_id', e.target.value)}
                     >
 
-                        <option value="">
-                            Assign Mechanic
-                        </option>
-
-
-                        {mechanics.map(mechanic => (
+                        {mechanics.map((mechanic) => (
 
                             <option
                                 key={mechanic.id}
@@ -99,8 +82,8 @@ export default function CreateVehicle({ mechanics }) {
 
                         ))}
 
-
                     </select>
+
                     <select
                         className="w-full border p-2 mb-6"
                         value={data.status}
@@ -123,19 +106,17 @@ export default function CreateVehicle({ mechanics }) {
 
                     <button
                         disabled={processing}
-                        className="bg-blue-600 text-white px-4 py-2 rounded"
+                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                     >
-                        Save Vehicle
+                        Save Changes
                     </button>
-
 
                 </form>
 
-
             </div>
-
 
         </AdminLayout>
 
     );
+
 }
