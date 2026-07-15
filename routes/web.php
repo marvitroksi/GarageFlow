@@ -74,6 +74,27 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 
     Route::get('/service-orders', [ServiceOrderController::class, 'index'])
         ->name('admin.service-orders');
+
+    Route::get('/service-orders', [ServiceOrderController::class, 'index'])
+        ->name('admin.service-orders');
+
+    Route::get('/service-orders/create', [ServiceOrderController::class, 'create'])
+        ->name('admin.service-orders.create');
+
+    Route::post('/service-orders', [ServiceOrderController::class, 'store'])
+        ->name('admin.service-orders.store');
+
+    Route::get('/service-orders/{serviceOrder}', [ServiceOrderController::class, 'show'])
+        ->name('admin.service-orders.show');
+
+    Route::get('/service-orders/{serviceOrder}/edit', [ServiceOrderController::class, 'edit'])
+        ->name('admin.service-orders.edit');
+
+    Route::put('/service-orders/{serviceOrder}', [ServiceOrderController::class, 'update'])
+        ->name('admin.service-orders.update');
+
+    Route::delete('/service-orders/{serviceOrder}', [ServiceOrderController::class, 'destroy'])
+        ->name('admin.service-orders.destroy');
         
     Route::get('/inventory', [InventoryController::class, 'index'])
         ->name('admin.inventory');
