@@ -7,6 +7,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\Admin\VehicleController;
+use App\Http\Controllers\Admin\ServiceOrderController;
+use App\Http\Controllers\Admin\InventoryController;
 
 
 Route::get('/', function () {
@@ -69,6 +71,27 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 
     Route::delete('/vehicles/{vehicle}', [VehicleController::class, 'destroy'])
         ->name('admin.vehicles.destroy');
+
+    Route::get('/service-orders', [ServiceOrderController::class, 'index'])
+        ->name('admin.service-orders');
+        
+    Route::get('/inventory', [InventoryController::class, 'index'])
+        ->name('admin.inventory');
+
+    Route::get('/inventory/create', [InventoryController::class, 'create'])
+        ->name('admin.inventory.create');
+
+    Route::post('/inventory', [InventoryController::class, 'store'])
+        ->name('admin.inventory.store');
+
+    Route::get('/inventory/{inventoryItem}/edit', [InventoryController::class, 'edit'])
+        ->name('admin.inventory.edit');
+
+    Route::put('/inventory/{inventoryItem}', [InventoryController::class, 'update'])
+        ->name('admin.inventory.update');
+
+    Route::delete('/inventory/{inventoryItem}', [InventoryController::class, 'destroy'])
+        ->name('admin.inventory.destroy');
 });
 
     

@@ -24,15 +24,15 @@ export default function AdminLayout({ children }) {
                         Vehicles
                     </Link>
 
-                    <Link href="#">
+                    <Link href="/admin/service-orders">
                         Service Orders
                     </Link>
 
-                    <Link href="#">
+                    <Link href="/admin/inventory">
                         Inventory
                     </Link>
 
-                    <Link href="#">
+                    <Link href="admin/payments">
                         Payments
                     </Link>
 
