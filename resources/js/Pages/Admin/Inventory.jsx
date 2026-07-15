@@ -65,13 +65,24 @@ export default function Inventory({ items }) {
 
 
 
-                {items.length === 0 ? (
+                {filteredItems.length === 0 ? (
 
-                    <p className='text-gray-500 text-center py-6'>
-                        No inventory items found.
-                    </p>
+                    <div className="text-center py-10">
 
+                        <p className='text-gray-500 text-center py-6'>
+                            No inventory items found.
+                        </p>
+
+                         <Link
+                            href="/admin/inventory/create"
+                            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                        >
+                            Add your first vehicle
+                        </Link>
+
+                    </div>
                 ) : (
+
 
 
                     <table className="w-full">

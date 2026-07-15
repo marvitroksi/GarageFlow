@@ -1,8 +1,11 @@
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Link, router } from '@inertiajs/react';
 import { Pencil, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 
 export default function Vehicles({ vehicles }) {
+
+    const [search, setSearch] = useState('');
 
     function handleDelete(id) {
 
@@ -13,6 +16,13 @@ export default function Vehicles({ vehicles }) {
         }
 
     }
+
+    const filteredVehicles = vehicles.filter((vehicle) =>
+        vehicle.license_plate.toLowerCase().includes(search.toLowerCase()) ||
+        vehicle.brand.toLowerCase().includes(search.toLowerCase()) ||
+        vehicle.model.toLowerCase().includes(search.toLowerCase()) ||
+        vehicle.owner_name.toLowerCase().includes(search.toLowerCase())
+    );
     return (
 
         <AdminLayout>
@@ -32,13 +42,25 @@ export default function Vehicles({ vehicles }) {
 
             </div>
 
+            <div className="mb-6">
+
+                <input
+                    type="text"
+                    placeholder="Search vehicles..."
+                    className="w-full border rounded-lg p-3"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                />
+
+            </div>
+
             <div className="bg-white p-6 rounded-lg shadow">
 
                 <h2 className="text-xl font-semibold mb-4">
                     Vehicles
                 </h2>
 
-                {vehicles.length === 0 ? (
+                {filteredVehicles.length === 0 ? (
 
                     <div className="text-center py-10">
 
@@ -78,7 +100,7 @@ export default function Vehicles({ vehicles }) {
 
                             <tbody>
 
-                                {vehicles.map((vehicle) => (
+                                {filteredVehicles.map((vehicle) => (
 
                                     <tr
                                         key={vehicle.id}
