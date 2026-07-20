@@ -95,7 +95,8 @@ class ServiceOrderController extends Controller
         $serviceOrder->load([
             'vehicle',
             'mechanic',
-            'items.inventoryItem'
+            'items.inventoryItem',
+            'payments'
         ]);
 
         return Inertia::render('Admin/ShowServiceOrder', [

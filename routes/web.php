@@ -9,6 +9,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\Admin\VehicleController;
 use App\Http\Controllers\Admin\ServiceOrderController;
 use App\Http\Controllers\Admin\InventoryController;
+use App\Http\Controllers\Admin\PaymentController;
 
 
 Route::get('/', function () {
@@ -75,9 +76,6 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/service-orders', [ServiceOrderController::class, 'index'])
         ->name('admin.service-orders');
 
-    Route::get('/service-orders', [ServiceOrderController::class, 'index'])
-        ->name('admin.service-orders');
-
     Route::get('/service-orders/create', [ServiceOrderController::class, 'create'])
         ->name('admin.service-orders.create');
 
@@ -133,6 +131,26 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         '/service-order-items/{item}',
         [ServiceOrderController::class, 'updateItem']
     );
+
+    Route::get(
+        '/service-orders/{serviceOrder}/payments/create',
+        [PaymentController::class, 'create']
+    )->name('admin.payments.create');
+
+    Route::post(
+        '/service-orders/{serviceOrder}/payments',
+        [PaymentController::class, 'store']
+    )->name('admin.payments.store');
+
+    Route::get('/payments', [PaymentController::class, 'index'])
+        ->name('admin.payments');
+
+    Route::get('/payments/{payment}', [PaymentController::class, 'show'])
+        ->name('admin.payments.show');
+
+    Route::delete('/payments/{payment}', [PaymentController::class, 'destroy'])
+        ->name('admin.payments.destroy');
+
 });
 
     

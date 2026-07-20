@@ -32,7 +32,7 @@ export default function AdminLayout({ children }) {
                         Inventory
                     </Link>
 
-                    <Link href="admin/payments">
+                    <Link href="/admin/payments">
                         Payments
                     </Link>
 

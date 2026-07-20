@@ -143,12 +143,6 @@ export default function Vehicles({ vehicles }) {
 
                                             <div className="flex justify-center items-center gap-4">
 
-                                                {/*<Link
-                                                    href={`/admin/vehicles/${vehicle.id}/edit`}
-                                                    className="text-blue-600 hover:text-blue-800"
-                                                    title="Edit vehicle"
-                                                >*/}
-
                                                 <Link
                                                     href={`/admin/vehicles/${vehicle.id}/edit`}
                                                     className="p-2 rounded hover:bg-blue-100 text-blue-600"
@@ -158,11 +152,6 @@ export default function Vehicles({ vehicles }) {
                                                 </Link>
                                                 
 
-                                                {/*<button
-                                                    onClick={() => handleDelete(vehicle.id)}
-                                                    className="text-red-600 hover:text-red-800"
-                                                    title="Delete vehicle"
-                                                >*/}
                                                 <button
                                                     onClick={() => handleDelete(vehicle.id)}
                                                     className="p-2 rounded hover:bg-red-100 text-red-600"
