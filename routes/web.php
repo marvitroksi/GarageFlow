@@ -113,6 +113,26 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 
     Route::delete('/inventory/{inventoryItem}', [InventoryController::class, 'destroy'])
         ->name('admin.inventory.destroy');
+
+    Route::get(
+        '/service-orders/{serviceOrder}/items/create',
+        [ServiceOrderController::class, 'createItem']
+    )->name('admin.service-orders.items.create');
+
+    Route::post(
+         '/service-orders/{serviceOrder}/items',
+         [ServiceOrderController::class, 'storeItem']
+    )->name('admin.service-orders.items.store');
+
+    Route::get(
+        '/service-order-items/{item}/edit',
+        [ServiceOrderController::class, 'editItem']
+    );
+
+    Route::put(
+        '/service-order-items/{item}',
+        [ServiceOrderController::class, 'updateItem']
+    );
 });
 
     

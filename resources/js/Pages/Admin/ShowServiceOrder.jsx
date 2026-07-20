@@ -154,15 +154,77 @@ export default function ShowServiceOrder({ order }) {
                     </h2>
 
 
-                    <p className="text-gray-700">
-
-                        Labor Cost:
-
+                    <p className="text-gray-700 mb-4">
+                        Labor:
                         {' '}
-
                         €{Number(order.labor_cost).toFixed(2)}
-
                     </p>
+
+
+
+                    <h3 className="font-semibold mb-2">
+                        Parts Used
+                    </h3>
+
+
+                    {order.items.length > 0 ? (
+
+                        <div className="space-y-2">
+
+                            {order.items.map((item) => (
+
+                                <div
+                                    key={item.id}
+                                    className="flex justify-between items-center border-b pb-2"
+                                >
+
+                                    <span>
+                                        {item.inventory_item.name}
+                                        {' '}
+                                        x{item.quantity}
+                                    </span>
+
+
+                                    <span>
+                                        €
+                                        {(item.price * item.quantity).toFixed(2)}
+                                    </span>
+
+                                    <Link
+                                        href={`/admin/service-order-items/${item.id}/edit`}
+                                        className="text-blue-600 hover:underline"
+                                    >
+                                        Edit
+                                    </Link>
+
+                                </div>
+
+                            ))}
+
+                        </div>
+
+                    ) : (
+
+                        <p className="text-gray-500">
+                            No parts used.
+                        </p>
+
+                    )}
+                    
+                    <div className="border-t mt-4 pt-4 font-bold">
+
+                        Total:
+                        €
+                        {(
+                            Number(order.labor_cost) +
+                            order.items.reduce(
+                                (total, item) =>
+                                    total + (item.price * item.quantity),
+                                0
+                            )
+                        ).toFixed(2)}
+
+                    </div>
 
 
                 </div>
@@ -193,7 +255,16 @@ export default function ShowServiceOrder({ order }) {
             </div>
 
 
+            <div className="mt-6">
 
+                <Link
+                    href={`/admin/service-orders/${order.id}/items/create`}
+                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                >
+                    Add Part
+                </Link>
+
+            </div>
         </AdminLayout>
 
     );

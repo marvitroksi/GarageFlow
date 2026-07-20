@@ -131,7 +131,7 @@ export default function ServiceOrders({ orders }) {
 
 
                                 <th className="text-left py-3">
-                                    Labor Cost
+                                    Total Cost
                                 </th>
 
 
@@ -153,7 +153,7 @@ export default function ServiceOrders({ orders }) {
 
 
                             {filteredOrders.map((order) => (
-
+                                
 
 
                                 <tr
@@ -232,7 +232,7 @@ export default function ServiceOrders({ orders }) {
 
                                     <td className="py-3">
 
-                                        €{Number(order.labor_cost).toFixed(2)}
+                                        €{Number(order.total_cost).toFixed(2)}
 
                                     </td>
 
@@ -292,7 +292,6 @@ export default function ServiceOrders({ orders }) {
 
 
                                 </tr>
-
 
 
                             ))}

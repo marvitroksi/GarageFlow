@@ -32,4 +32,9 @@ class ServiceOrder extends Model
     {
         return $this->belongsTo(User::class, 'mechanic_id');
     }
+
+    public function items()
+    {
+        return $this->hasMany(ServiceOrderItem::class);
+    }
 }
