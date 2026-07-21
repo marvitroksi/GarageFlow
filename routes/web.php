@@ -151,6 +151,10 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::delete('/payments/{payment}', [PaymentController::class, 'destroy'])
         ->name('admin.payments.destroy');
 
+    Route::patch(
+        '/admin/service-orders/{serviceOrder}/status',
+        [ServiceOrderController::class, 'updateStatus']
+    )->name('admin.service-orders.status');
 });
 
     

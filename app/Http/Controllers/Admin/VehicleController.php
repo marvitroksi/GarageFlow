@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Vehicle;
 use App\Models\User;
+use App\Models\ServiceOrder;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -38,12 +39,12 @@ class VehicleController extends Controller
             'model' => 'required',
             'year' => 'required',
             'owner_name' => 'required',
-            'mechanic_id' => 'required',
+            'mechanic_id' => 'nullable',
             'status' => 'required',
         ]);
 
 
-        Vehicle::create([
+        $vehicle = Vehicle::create([
             'license_plate' => $request->license_plate,
             'brand' => $request->brand,
             'model' => $request->model,
@@ -51,6 +52,20 @@ class VehicleController extends Controller
             'owner_name' => $request->owner_name,
             'mechanic_id' => $request->mechanic_id,
             'status' => $request->status,
+        ]);
+
+        ServiceOrder::create([
+
+            'vehicle_id' => $vehicle->id,
+
+            'mechanic_id' => $vehicle->mechanic_id,
+
+            'description' => 'Vehicle inspection pending',
+
+            'status' => 'pending',
+
+            'labor_cost' => 0,
+
         ]);
 
 

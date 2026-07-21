@@ -225,29 +225,7 @@ export default function ShowServiceOrder({ order }) {
                         ).toFixed(2)}
 
                     </div>
-                    
-                    {order.payments.length === 0 && (
-
-                        <Link
-                            href={`/admin/service-orders/${order.id}/payments/create`}
-                            className=" 
-                                inline-flex
-                                items-center
-                                justify-center
-                                bg-green-600
-                                text-white
-                                px-5
-                                py-2
-                                rounded-lg
-                                font-medium
-                                shadow-sm
-                                hover:bg-green-700
-                                transition"
-                        >
-                            Add Payment
-                        </Link>
-
-                    )}
+                
 
                 </div>
 

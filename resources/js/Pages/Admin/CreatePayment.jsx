@@ -5,10 +5,6 @@ export default function CreatePayment({ serviceOrder }) {
 
     const { data, setData, post, processing, errors } = useForm({
 
-        amount: '',
-
-        status: 'paid',
-
         notes: '',
 
     });
@@ -60,71 +56,25 @@ export default function CreatePayment({ serviceOrder }) {
                                 Amount
                             </label>
 
-
-                            <input
-                                type="number"
-                                step="0.01"
-                                className="w-full border p-2 rounded"
-                                value={data.amount}
-                                onChange={(e) =>
-                                    setData(
-                                        'amount',
-                                        e.target.value
-                                    )
-                                }
-                            />
-
-
-                            {errors.amount && (
-
-                                <p className="text-red-600 text-sm mt-1">
-                                    {errors.amount}
-                                </p>
-
-                            )}
+                            <p className="text-xl font-bold">
+                                €{Number(serviceOrder.total_cost).toFixed(2)}
+                            </p>
 
                         </div>
-
-
 
                         <div className="mb-5">
 
                             <label className="block font-medium mb-2">
-                                Status
+                                Payment Method
                             </label>
 
-
-                            <select
-
-                                className="w-full border p-2 rounded"
-
-                                value={data.status}
-
-                                onChange={(e) =>
-                                    setData(
-                                        'status',
-                                        e.target.value
-                                    )
-                                }
-
-                            >
-
-                                <option value="paid">
-                                    Paid
-                                </option>
-
-
-                                <option value="pending">
-                                    Pending
-                                </option>
-
-
-                            </select>
+                            <p className="text-gray-700">
+                                Cash
+                            </p>
 
                         </div>
 
-
-
+                        
                         <div className="mb-5">
 
                             <label className="block font-medium mb-2">
@@ -170,7 +120,7 @@ export default function CreatePayment({ serviceOrder }) {
 
                             <Link
 
-                                href={`/admin/service-orders/${serviceOrder.id}`}
+                                href={`/admin/payments`}
 
                                 className="bg-gray-200 px-5 py-2 rounded hover:bg-gray-300"
 

@@ -92,7 +92,7 @@ export default function ShowPayment({ payment }) {
                     Service Order
                 </h2>
 
-                <p className="text-gray-700 mb-3">
+                <p className="text-gray-700 mt-3">
 
                     Order:
 

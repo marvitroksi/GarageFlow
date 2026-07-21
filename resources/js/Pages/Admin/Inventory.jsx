@@ -48,10 +48,20 @@ export default function Inventory({ items }) {
 
                 <input
                     type="text"
-                    placeholder="Search inventory..."
-                    className="w-full border rounded-lg p-3"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Search by name, category or supplier..."
+                    className="
+                        w-full
+                        md:w-1/3
+                        px-4
+                        py-2
+                        border
+                        rounded-lg
+                        focus:outline-none
+                        focus:ring-2
+                        focus:ring-blue-500
+                    "
                 />
 
             </div>

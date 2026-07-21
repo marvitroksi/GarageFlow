@@ -46,10 +46,20 @@ export default function Vehicles({ vehicles }) {
 
                 <input
                     type="text"
-                    placeholder="Search vehicles..."
-                    className="w-full border rounded-lg p-3"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Search by plate, brand, model or owner..."
+                    className="
+                        w-full
+                        md:w-1/3
+                        px-4
+                        py-2
+                        border
+                        rounded-lg
+                        focus:outline-none
+                        focus:ring-2
+                        focus:ring-blue-500
+                    "
                 />
 
             </div>

@@ -13,6 +13,23 @@ class PaymentController extends Controller
 
     public function create(ServiceOrder $serviceOrder)
     {
+        $serviceOrder->load([
+            'vehicle',
+            'items'
+        ]);
+
+
+        $partsCost = $serviceOrder->items->sum(function ($item) {
+
+            return $item->price * $item->quantity;
+
+        });
+
+
+        $serviceOrder->total_cost =
+            $serviceOrder->labor_cost + $partsCost;
+
+
         return Inertia::render('Admin/CreatePayment', [
             'serviceOrder' => $serviceOrder,
         ]);
@@ -23,10 +40,6 @@ class PaymentController extends Controller
     public function store(Request $request, ServiceOrder $serviceOrder)
     {
         $request->validate([
-
-            'amount' => 'required|numeric|min:0',
-
-            'status' => 'required|in:pending,paid',
 
             'notes' => 'nullable|string',
 
@@ -48,18 +61,22 @@ class PaymentController extends Controller
 
         }
 
+        $serviceOrder->load('items');
 
+        $partsCost = $serviceOrder->items->sum(function ($item) {
+
+            return $item->price * $item->quantity;
+
+        });
+
+        $totalCost = $serviceOrder->labor_cost + $partsCost;
 
         Payment::create([
 
             'service_order_id' => $serviceOrder->id,
-
-            'amount' => $request->amount,
-
+            'amount' => $totalCost,
             'method' => 'cash',
-
-            'status' => $request->status,
-
+            'status' => 'paid',
             'notes' => $request->notes,
 
         ]);
@@ -78,14 +95,16 @@ class PaymentController extends Controller
 
     public function index(Request $request)
     {
-        $payments = Payment::with([
-            'serviceOrder.vehicle'
+        $serviceOrders = ServiceOrder::with([
+            'vehicle',
+            'payments',
+            'items'
         ])
         ->when($request->search, function ($query) use ($request) {
 
             $search = $request->search;
 
-            $query->whereHas('serviceOrder.vehicle', function ($q) use ($search) {
+            $query->whereHas('vehicle', function ($q) use ($search) {
 
                 $q->where('brand', 'like', "%{$search}%")
                 ->orWhere('model', 'like', "%{$search}%")
@@ -98,11 +117,31 @@ class PaymentController extends Controller
         ->get();
 
 
+        $serviceOrders->each(function ($order) {
+
+            $partsCost = $order->items->sum(function ($item) {
+
+                return $item->price * $item->quantity;
+
+            });
+
+            $order->total_cost = $order->labor_cost + $partsCost;
+
+            $order->payment_status = $order->payments->count() > 0
+                ? 'paid'
+                : 'pending';
+
+        });
+
+
         return Inertia::render('Admin/Payments', [
-            'payments' => $payments,
+
+            'serviceOrders' => $serviceOrders,
+
             'filters' => [
                 'search' => $request->search
             ]
+
         ]);
     }
 

@@ -8,6 +8,7 @@ export default function ServiceOrders({ orders }) {
 
     const [search, setSearch] = useState('');
 
+
     function deleteOrder(id) {
 
         if (confirm('Delete this service order?')) {
@@ -15,6 +16,17 @@ export default function ServiceOrders({ orders }) {
             router.delete(`/admin/service-orders/${id}`);
 
         }
+
+    }
+
+    function updateStatus(id, status) {
+
+        router.patch(
+            `/admin/service-orders/${id}/status`,
+            {
+                status: status
+            }
+        );
 
     }
 
@@ -32,7 +44,38 @@ export default function ServiceOrders({ orders }) {
 
         order.status.toLowerCase().includes(search.toLowerCase())
 
-);
+    );
+
+
+    const sections = [
+
+        {
+            title: 'Pending / Waiting',
+            orders: filteredOrders.filter(
+                (order) => order.status === 'pending'
+            ),
+            badge: 'bg-yellow-100 text-yellow-700'
+        },
+
+        {
+            title: 'In Progress',
+            orders: filteredOrders.filter(
+                (order) => order.status === 'in_progress'
+            ),
+            badge: 'bg-blue-100 text-blue-700'
+        },
+
+        {
+            title: 'Completed',
+            orders: filteredOrders.filter(
+                (order) => order.status === 'completed'
+            ),
+            badge: 'bg-green-100 text-green-700'
+        }
+
+    ];
+
+
 
     return (
 
@@ -47,266 +90,366 @@ export default function ServiceOrders({ orders }) {
                 </h1>
 
 
-
-                <Link
-                    href="/admin/service-orders/create"
-                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                >
-                    Create Order
-                </Link>
-
-
             </div>
+
+
 
             <div className="mb-6">
 
+
                 <input
+
                     type="text"
-                    placeholder="Search service orders..."
-                    className="w-full border rounded-lg p-3"
+
                     value={search}
+
                     onChange={(e) => setSearch(e.target.value)}
+
+                    placeholder="Search by vehicle, mechanic, status..."
+
+                    className="
+                        w-full
+                        md:w-1/3
+                        px-4
+                        py-2
+                        border
+                        rounded-lg
+                        focus:outline-none
+                        focus:ring-2
+                        focus:ring-blue-500
+                    "
+
                 />
+
 
             </div>
 
 
-            <div className="bg-white rounded-lg shadow p-6">
 
 
-                {filteredOrders.length === 0 ? (
+            <div className="space-y-10">
 
 
-                    <div className="text-center py-6">
+                {sections.map((section) => (
 
 
-                        <p className="text-gray-500 mb-4">
-                            No service orders found.
-                        </p>
+                    <div key={section.title}>
 
 
-                        <Link
-                            href="/admin/service-orders/create"
-                            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                        >
-                            Create your first order
-                        </Link>
+                        <div className="flex items-center gap-3 mb-4">
 
 
-                    </div>
+                            <h2 className="text-2xl font-bold">
 
+                                {section.title}
 
+                            </h2>
 
-                ) : (
 
+                            <span
+                                className={`
+                                    px-3
+                                    py-1
+                                    rounded-full
+                                    text-sm
+                                    font-medium
+                                    ${section.badge}
+                                `}
+                            >
 
+                                {section.orders.length}
 
-                    <table className="w-full">
+                            </span>
 
 
-                        <thead>
+                        </div>
 
 
-                            <tr className="border-b">
 
 
-                                <th className="text-left py-3">
-                                    Vehicle
-                                </th>
 
+                        {section.orders.length === 0 ? (
 
-                                <th className="text-left py-3">
-                                    Mechanic
-                                </th>
 
+                            <div className="bg-white rounded-lg shadow p-6">
 
-                                <th className="text-left py-3">
-                                    Description
-                                </th>
 
+                                <p className="text-gray-500">
 
-                                <th className="text-left py-3">
-                                    Status
-                                </th>
+                                    No orders in this category.
 
+                                </p>
 
-                                <th className="text-left py-3">
-                                    Total Cost
-                                </th>
 
+                            </div>
 
-                                <th className="text-center py-3">
-                                    Actions
-                                </th>
 
 
-                            </tr>
+                        ) : (
 
 
-                        </thead>
 
+                            <div className="
+                                grid
+                                grid-cols-1
+                                md:grid-cols-2
+                                xl:grid-cols-3
+                                gap-6
+                            ">
 
 
 
-                        <tbody>
+                                {section.orders.map((order) => (
 
 
+                                    <div
 
-                            {filteredOrders.map((order) => (
-                                
+                                        key={order.id}
 
+                                        className="
+                                            bg-white
+                                            rounded-lg
+                                            shadow
+                                            p-6
+                                        "
 
-                                <tr
-                                    key={order.id}
-                                    className="border-b"
-                                >
+                                    >
 
 
 
-                                    <td className="py-3">
+                                        <div className="flex justify-between items-start">
 
-                                        {order.vehicle.brand}
-                                        {' '}
-                                        {order.vehicle.model}
 
-                                    </td>
+                                            <div>
 
 
+                                                <h3 className="text-xl font-bold">
 
+                                                    {order.vehicle.brand}
 
-                                    <td className="py-3">
+                                                    {' '}
 
-                                        {order.mechanic
-                                            ? order.mechanic.name
-                                            : 'Unassigned'}
+                                                    {order.vehicle.model}
 
-                                    </td>
+                                                </h3>
 
 
+                                                <p className="text-gray-500">
 
+                                                    {order.vehicle.license_plate}
 
-                                    <td className="py-3">
+                                                </p>
 
-                                        {order.description}
 
-                                    </td>
+                                            </div>
 
-
-
-
-                                    <td className="py-3">
-
-
-                                        <td className="py-3">
 
 
                                             <span
-                                                className={`px-3 py-1 rounded-full text-sm font-medium ${
-                                                    
-                                                    order.status === 'completed'
-                                                        ? 'bg-green-100 text-green-700'
-                                                        : order.status === 'in_progress'
-                                                            ? 'bg-yellow-100 text-yellow-700'
-                                                            : 'bg-gray-100 text-gray-700'
-
-                                                }`}
+                                                className={`
+                                                    px-3
+                                                    py-1
+                                                    rounded-full
+                                                    text-xs
+                                                    font-medium
+                                                    ${section.badge}
+                                                `}
                                             >
 
-                                                {order.status === 'completed'
-                                                    ? 'Completed'
-                                                    : order.status === 'in_progress'
-                                                        ? 'In Progress'
-                                                        : 'Pending'
-                                                }
+                                                {section.title}
 
                                             </span>
-
-
-                                        </td>
-
-
-                                    </td>
-
-
-
-
-                                    <td className="py-3">
-
-                                        €{Number(order.total_cost).toFixed(2)}
-
-                                    </td>
-
-
-
-
-                                    <td className="py-3">
-
-
-                                        <div className="flex justify-center items-center gap-4">
-
-
-                                            <Link
-                                                href={`/admin/service-orders/${order.id}`}
-                                                className="text-green-600 hover:text-green-800"
-                                                title="View order"
-                                            >
-
-                                                <Eye size={18} />
-
-                                            </Link>
-
-
-
-
-                                            <Link
-                                                href={`/admin/service-orders/${order.id}/edit`}
-                                                className="text-blue-600 hover:text-blue-800"
-                                                title="Edit order"
-                                            >
-
-                                                <Pencil size={18} />
-
-                                            </Link>
-
-
-
-
-                                            <button
-                                                onClick={() => deleteOrder(order.id)}
-                                                className="text-red-600 hover:text-red-800"
-                                                title="Delete order"
-                                            >
-
-                                                <Trash2 size={18} />
-
-                                            </button>
-
 
 
                                         </div>
 
 
-                                    </td>
+
+
+
+                                        <div className="mt-5 space-y-2">
+
+
+                                            <p>
+
+                                                <strong>
+                                                    Assigned Mechanic:
+                                                </strong>
+
+
+                                                {' '}
+
+
+                                                {order.mechanic
+                                                    ? order.mechanic.name
+                                                    : 'Unassigned'}
+
+                                            </p>
+
+
+
+                                            <p>
+
+                                                <strong>
+                                                    Description:
+                                                </strong>
+
+
+                                                {' '}
+
+
+                                                {order.description}
+
+                                            </p>
 
 
 
 
-                                </tr>
+                                            <p>
+
+                                                <strong>
+                                                    Total:
+                                                </strong>
 
 
-                            ))}
+                                                {' '}
+
+
+                                                €{Number(order.total_cost).toFixed(2)}
+
+                                            </p>
+
+
+                                        </div>
 
 
 
-                        </tbody>
+
+
+                                        <div className="flex items-center gap-3 mt-6 flex-wrap">
+
+                                            {order.status === 'pending' && (
+
+                                                <button
+                                                    onClick={() =>
+                                                        updateStatus(order.id, 'in_progress')
+                                                    }
+                                                    className="
+                                                        bg-blue-600
+                                                        text-white
+                                                        px-3
+                                                        py-1
+                                                        rounded
+                                                        text-sm
+                                                    "
+                                                >
+                                                    Start Repair
+                                                </button>
+
+                                            )}
+
+
+                                            {order.status === 'in_progress' && (
+
+                                                <button
+                                                    onClick={() =>
+                                                        updateStatus(order.id, 'completed')
+                                                    }
+                                                    className="
+                                                        bg-green-600
+                                                        text-white
+                                                        px-3
+                                                        py-1
+                                                        rounded
+                                                        text-sm
+                                                    "
+                                                >
+                                                    Complete
+                                                </button>
+
+                                            )}
+
+                                            <Link
+
+                                                href={`/admin/service-orders/${order.id}`}
+
+                                                className="
+                                                    text-green-600
+                                                    hover:text-green-800
+                                                "
+
+                                                title="View order"
+
+                                            >
+
+                                                <Eye size={20}/>
+
+                                            </Link>
 
 
 
-                    </table>
+
+
+                                            <Link
+
+                                                href={`/admin/service-orders/${order.id}/edit`}
+
+                                                className="
+                                                    text-blue-600
+                                                    hover:text-blue-800
+                                                "
+
+                                                title="Edit order"
+
+                                            >
+
+                                                <Pencil size={20}/>
+
+                                            </Link>
 
 
 
-                )}
+
+
+                                            <button
+
+                                                onClick={() => deleteOrder(order.id)}
+
+                                                className="
+                                                    text-red-600
+                                                    hover:text-red-800
+                                                "
+
+                                                title="Delete order"
+
+                                            >
+
+                                                <Trash2 size={20}/>
+
+                                            </button>
+
+
+                                        </div>
+
+
+                                    </div>
+
+
+                                ))}
+
+
+
+                            </div>
+
+
+                        )}
+
+
+
+                    </div>
+
+
+                ))}
 
 
 

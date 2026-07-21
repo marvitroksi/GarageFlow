@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Eye, Trash2 } from 'lucide-react';
 
 
-export default function Payments({ payments, filters }) {
+export default function Payments({ serviceOrders, filters }) {
 
     const [search, setSearch] = useState(filters.search || '');
 
@@ -107,110 +107,67 @@ export default function Payments({ payments, filters }) {
                     <tbody>
 
 
-                    {payments.map((payment) => (
+                    {serviceOrders.map((order) => (
 
-                        <tr
-                            key={payment.id}
-                            className="border-t hover:bg-gray-50"
-                        >
+                        <tr key={order.id} className="border-b hover:bg-gray-50">
 
                             <td className="p-3">
-                                #{payment.service_order_id}
+                                #{order.id}
                             </td>
-
 
                             <td className="p-3">
-
-                                {payment.service_order.vehicle.brand}
-
-                                {' '}
-
-                                {payment.service_order.vehicle.model}
-
+                                {order.vehicle.brand} {order.vehicle.model}
                             </td>
 
-
-                            <td className="p-3 font-semibold">
-
-                                €{Number(payment.amount).toFixed(2)}
-
+                            <td className="p-3">
+                                {order.vehicle.license_plate}
                             </td>
 
-
-                            <td className="p-3 capitalize">
-
-                                {payment.method}
-
+                            <td className="p-3">
+                                €{Number(order.total_cost).toFixed(2)}
                             </td>
-
 
                             <td className="p-3">
 
                                 <span
-                                    className={`
-                                        px-3
-                                        py-1
-                                        rounded-full
-                                        text-sm
-                                        font-medium
-                                        ${
-                                            payment.status === 'paid'
-                                                ? 'bg-green-100 text-green-700'
-                                                : 'bg-red-100 text-red-700'
-                                        }
-                                    `}
+                                    className={`px-3 py-1 rounded-full text-sm font-medium ${
+                                        order.payment_status === 'paid'
+                                            ? 'bg-green-100 text-green-700'
+                                            : 'bg-red-100 text-red-700'
+                                    }`}
                                 >
 
-                                    {payment.status === 'paid'
+                                    {order.payment_status === 'paid'
                                         ? 'Paid'
-                                        : 'Not Paid'
-                                    }
+                                        : 'Pending'}
 
                                 </span>
 
                             </td>
 
-                            <td className="p-3 flex gap-5">
+                            <td className="p-3">
 
+                                {order.payment_status === 'paid' ? (
 
-                                <Link
-                                    href={`/admin/payments/${payment.id}`}
-                                    className="
-                                        text-green-600
-                                        hover:text-green-800
-                                        transition
-                                    "
-                                    title="View payment"
-                                >
-                                    <Eye size={18} />
-                                </Link>
+                                    <Link
+                                        href={`/admin/payments/${order.payments[0].id}`}
+                                        className="text-blue-600 hover:underline"
+                                    >
+                                        View
+                                    </Link>
 
+                                ) : (
 
-                                <button
-                                    onClick={() => {
+                                    <Link
+                                        href={`/admin/service-orders/${order.id}/payments/create`}
+                                        className="text-green-600 hover:underline"
+                                    >
+                                        Add Payment
+                                    </Link>
 
-                                        if(confirm('Are you sure you want to delete this payment?')) {
-
-                                            router.delete(
-                                                `/admin/payments/${payment.id}`
-                                            );
-
-                                        }
-
-                                    }}
-                                    className="
-                                        text-red-600
-                                        hover:text-red-800
-                                        transition
-                                    "
-                                    title="Delete payment"
-                                >
-                                    <Trash2 size={18} />
-                                </button>
-
+                                )}
 
                             </td>
-
 
                         </tr>
 

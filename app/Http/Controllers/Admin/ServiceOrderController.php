@@ -20,7 +20,8 @@ class ServiceOrderController extends Controller
         $orders = ServiceOrder::with([
             'vehicle',
             'mechanic',
-            'items'
+            'items',
+            'payments'
         ])->get();
 
         $orders->each(function ($order) {
@@ -56,8 +57,6 @@ class ServiceOrderController extends Controller
         ]);
     }
 
-
-
     public function store(Request $request)
     {
 
@@ -71,8 +70,6 @@ class ServiceOrderController extends Controller
 
         ]);
 
-
-
         ServiceOrder::create([
 
             'vehicle_id' => $request->vehicle_id,
@@ -84,8 +81,6 @@ class ServiceOrderController extends Controller
 
         ]);
 
-
-
         return redirect()->route('admin.service-orders');
 
     }
@@ -95,8 +90,7 @@ class ServiceOrderController extends Controller
         $serviceOrder->load([
             'vehicle',
             'mechanic',
-            'items.inventoryItem',
-            'payments'
+            'items.inventoryItem'
         ]);
 
         return Inertia::render('Admin/ShowServiceOrder', [
@@ -119,6 +113,7 @@ class ServiceOrderController extends Controller
 
         return redirect()->route('admin.service-orders');
     }
+
     public function update(Request $request, ServiceOrder $serviceOrder)
     {
         $request->validate([
@@ -265,6 +260,25 @@ class ServiceOrderController extends Controller
             ->with(
                 'success',
                 'Part updated successfully.'
+            );
+    }
+
+    public function updateStatus(Request $request, ServiceOrder $serviceOrder)
+    {
+        $request->validate([
+            'status' => 'required|in:pending,in_progress,completed'
+        ]);
+
+
+        $serviceOrder->update([
+            'status' => $request->status
+        ]);
+
+
+        return back()
+            ->with(
+                'success',
+                'Service order status updated.'
             );
     }
 }
