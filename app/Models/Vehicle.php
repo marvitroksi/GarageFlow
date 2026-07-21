@@ -24,4 +24,9 @@ class Vehicle extends Model
     {
         return $this->belongsTo(User::class, 'mechanic_id');
     }
+
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class);
+    }
 }

@@ -10,7 +10,7 @@ use App\Http\Controllers\Admin\VehicleController;
 use App\Http\Controllers\Admin\ServiceOrderController;
 use App\Http\Controllers\Admin\InventoryController;
 use App\Http\Controllers\Admin\PaymentController;
-
+use App\Http\Controllers\Admin\AppointmentController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -132,6 +132,26 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         [ServiceOrderController::class, 'updateItem']
     );
 
+    Route::patch(
+        '/service-orders/{serviceOrder}/labor-cost',
+        [ServiceOrderController::class, 'updateLaborCost']
+    )->name('admin.service-orders.labor-cost');
+
+    Route::patch(
+        '/service-orders/{serviceOrder}/mechanic',
+        [ServiceOrderController::class, 'updateMechanic']
+    )->name('admin.service-orders.mechanic');
+
+    Route::patch(
+        '/service-orders/{serviceOrder}/description',
+        [ServiceOrderController::class, 'updateDescription']
+    )->name('admin.service-orders.description');
+
+    Route::patch(
+        '/service-orders/{serviceOrder}/notes',
+        [ServiceOrderController::class, 'updateNotes']
+    )->name('admin.service-orders.notes');
+
     Route::get(
         '/service-orders/{serviceOrder}/payments/create',
         [PaymentController::class, 'create']
@@ -152,9 +172,18 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         ->name('admin.payments.destroy');
 
     Route::patch(
-        '/admin/service-orders/{serviceOrder}/status',
+        '/service-orders/{serviceOrder}/status',
         [ServiceOrderController::class, 'updateStatus']
     )->name('admin.service-orders.status');
+
+    Route::resource('appointments', AppointmentController::class)
+        ->names('admin.appointments');
+
+    Route::post(
+        '/appointments/{appointment}/start-repair',
+        [AppointmentController::class, 'startRepair']
+    )
+    ->name('appointments.startRepair');
 });
 
     

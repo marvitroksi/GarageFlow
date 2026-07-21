@@ -1,8 +1,30 @@
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
+import { useState } from 'react';
 
 
-export default function ShowServiceOrder({ order }) {
+export default function ShowServiceOrder({ order, mechanics }) {
+
+
+    const [laborCost, setLaborCost] = useState(
+        order.labor_cost || 0
+    );
+
+
+    const [mechanicId, setMechanicId] = useState(
+        order.mechanic_id || ''
+    );
+
+
+    const [description, setDescription] = useState(
+        order.description || ''
+    );
+
+
+    const [notes, setNotes] = useState(
+        order.notes || ''
+    );
+
 
 
     return (
@@ -13,21 +35,32 @@ export default function ShowServiceOrder({ order }) {
             <div className="flex justify-between items-center mb-6">
 
 
-                <h1 className="text-3xl font-bold">
-                    Service Order #{order.id}
-                </h1>
+                <div>
 
-                <p className="text-gray-500 mt-1">
-                    Created: {new Date(order.created_at).toLocaleDateString()}
-                </p>
+                    <h1 className="text-3xl font-bold">
+                        Service Order #{order.id}
+                    </h1>
 
-                <p className="text-gray-500">
-                    Last Updated: {new Date(order.updated_at).toLocaleDateString()}
-                </p>
+
+                    <p className="text-gray-500">
+                        Created:
+                        {' '}
+                        {new Date(order.created_at).toLocaleDateString()}
+                    </p>
+
+
+                </div>
+
 
                 <Link
                     href="/admin/service-orders"
-                    className="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300"
+                    className="
+                        bg-gray-200
+                        px-4
+                        py-2
+                        rounded
+                        hover:bg-gray-300
+                    "
                 >
                     Back
                 </Link>
@@ -38,9 +71,14 @@ export default function ShowServiceOrder({ order }) {
 
 
 
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
 
+
+
+
+                {/* Vehicle */}
 
                 <div className="bg-white p-6 rounded-lg shadow">
 
@@ -50,21 +88,17 @@ export default function ShowServiceOrder({ order }) {
                     </h2>
 
 
-                    <p className="text-gray-700">
-
+                    <p>
                         {order.vehicle.brand}
                         {' '}
                         {order.vehicle.model}
-
                     </p>
 
 
                     <p className="text-gray-500 mt-2">
-
                         Plate:
                         {' '}
                         {order.vehicle.license_plate}
-
                     </p>
 
 
@@ -72,6 +106,11 @@ export default function ShowServiceOrder({ order }) {
 
 
 
+
+
+
+
+                {/* Assignment */}
 
 
                 <div className="bg-white p-6 rounded-lg shadow">
@@ -82,23 +121,83 @@ export default function ShowServiceOrder({ order }) {
                     </h2>
 
 
-                    <p className="text-gray-700">
 
-                        Mechanic:
+                    <form
+                        onSubmit={(e)=>{
 
-                        {' '}
+                            e.preventDefault();
 
-                        {order.mechanic
-                            ? order.mechanic.name
-                            : 'Unassigned'}
 
-                    </p>
+                            router.patch(
+                                `/admin/service-orders/${order.id}/mechanic`,
+                                {
+                                    mechanic_id: mechanicId
+                                }
+                            );
+
+                        }}
+                        className="flex gap-3"
+                    >
+
+
+                        <select
+                            value={mechanicId}
+                            onChange={(e)=>
+                                setMechanicId(e.target.value)
+                            }
+                            className="
+                                border
+                                rounded-lg
+                                px-3
+                                py-2
+                                flex-1
+                            "
+                        >
+
+                            <option value="">
+                                Unassigned
+                            </option>
+
+
+                            {mechanics?.map((mechanic)=>(
+
+                                <option
+                                    key={mechanic.id}
+                                    value={mechanic.id}
+                                >
+                                    {mechanic.name}
+                                </option>
+
+                            ))}
+
+
+                        </select>
+
+
+                        <button
+                            className="
+                                bg-blue-600
+                                text-white
+                                px-4
+                                rounded-lg
+                            "
+                        >
+                            Save
+                        </button>
+
+
+                    </form>
 
 
                 </div>
 
 
 
+
+
+
+
+                {/* Repair Details */}
 
 
                 <div className="bg-white p-6 rounded-lg shadow">
@@ -109,41 +208,89 @@ export default function ShowServiceOrder({ order }) {
                     </h2>
 
 
-                    <p className="text-gray-700 mb-4">
 
-                        {order.description}
+                    <form
+                        onSubmit={(e)=>{
 
-                    </p>
-
-
+                            e.preventDefault();
 
 
-                    <span
-                        className={`px-3 py-1 rounded-full text-sm font-medium ${
-                            
-                            order.status === 'completed'
+                            router.patch(
+                                `/admin/service-orders/${order.id}/description`,
+                                {
+                                    description
+                                }
+                            );
+
+                        }}
+                    >
+
+
+                        <textarea
+                            value={description}
+                            onChange={(e)=>
+                                setDescription(e.target.value)
+                            }
+                            className="
+                                border
+                                rounded-lg
+                                w-full
+                                p-3
+                                mb-3
+                            "
+                        />
+
+
+                        <button
+                            className="
+                                bg-blue-600
+                                text-white
+                                px-4
+                                py-2
+                                rounded-lg
+                            "
+                        >
+                            Save Description
+                        </button>
+
+
+                    </form>
+
+
+
+                    <div className="mt-4">
+
+
+                        <span
+                            className={`px-3 py-1 rounded-full text-sm font-medium ${
+                                
+                                order.status === 'completed'
                                 ? 'bg-green-100 text-green-700'
                                 : order.status === 'in_progress'
                                     ? 'bg-yellow-100 text-yellow-700'
                                     : 'bg-gray-100 text-gray-700'
 
-                        }`}
-                    >
+                            }`}
+                        >
 
-                        {order.status === 'completed'
-                            ? 'Completed'
-                            : order.status === 'in_progress'
-                                ? 'In Progress'
-                                : 'Pending'
-                        }
+                            {order.status}
 
-                    </span>
+                        </span>
+
+
+                    </div>
 
 
                 </div>
 
 
 
+
+
+
+
+
+                {/* Costs */}
 
 
                 <div className="bg-white p-6 rounded-lg shadow">
@@ -154,11 +301,56 @@ export default function ShowServiceOrder({ order }) {
                     </h2>
 
 
-                    <p className="text-gray-700 mb-4">
-                        Labor:
-                        {' '}
-                        €{Number(order.labor_cost).toFixed(2)}
-                    </p>
+
+                    <form
+                        onSubmit={(e)=>{
+
+                            e.preventDefault();
+
+
+                            router.patch(
+                                `/admin/service-orders/${order.id}/labor-cost`,
+                                {
+                                    labor_cost: laborCost
+                                }
+                            );
+
+                        }}
+                        className="flex gap-3 mb-6"
+                    >
+
+
+                        <input
+                            type="number"
+                            value={laborCost}
+                            onChange={(e)=>
+                                setLaborCost(e.target.value)
+                            }
+                            className="
+                                border
+                                rounded-lg
+                                px-3
+                                py-2
+                                w-32
+                            "
+                        />
+
+
+                        <button
+                            className="
+                                bg-blue-600
+                                text-white
+                                px-4
+                                rounded-lg
+                            "
+                        >
+                            Save
+                        </button>
+
+
+                    </form>
+
+
 
 
 
@@ -167,70 +359,67 @@ export default function ShowServiceOrder({ order }) {
                     </h3>
 
 
-                    {order.items.length > 0 ? (
-
-                        <div className="space-y-2">
-
-                            {order.items.map((item) => (
-
-                                <div
-                                    key={item.id}
-                                    className="flex justify-between items-center border-b pb-2"
-                                >
-
-                                    <span>
-                                        {item.inventory_item.name}
-                                        {' '}
-                                        x{item.quantity}
-                                    </span>
+                    {order.items.map((item)=>(
 
 
-                                    <span>
-                                        €
-                                        {(item.price * item.quantity).toFixed(2)}
-                                    </span>
+                        <div
+                            key={item.id}
+                            className="
+                                flex
+                                justify-between
+                                border-b
+                                py-2
+                            "
+                        >
 
-                                    <Link
-                                        href={`/admin/service-order-items/${item.id}/edit`}
-                                        className="text-blue-600 hover:underline"
-                                    >
-                                        Edit
-                                    </Link>
+                            <span>
+                                {item.inventory_item.name}
+                                {' '}
+                                x{item.quantity}
+                            </span>
 
-                                </div>
 
-                            ))}
+                            <span>
+                                €
+                                {(item.price * item.quantity).toFixed(2)}
+                            </span>
+
 
                         </div>
 
-                    ) : (
 
-                        <p className="text-gray-500">
-                            No parts used.
-                        </p>
+                    ))}
 
-                    )}
-                    
+
+
+
                     <div className="border-t mt-4 pt-4 font-bold">
 
                         Total:
+
                         €
+
                         {(
-                            Number(order.labor_cost) +
+                            Number(laborCost)+
                             order.items.reduce(
-                                (total, item) =>
-                                    total + (item.price * item.quantity),
+                                (sum,item)=>
+                                sum + item.price * item.quantity,
                                 0
                             )
                         ).toFixed(2)}
 
                     </div>
-                
+
 
                 </div>
 
 
 
+
+
+
+
+                {/* Notes */}
 
 
                 <div className="bg-white p-6 rounded-lg shadow md:col-span-2">
@@ -241,30 +430,84 @@ export default function ShowServiceOrder({ order }) {
                     </h2>
 
 
-                    <p className="text-gray-700">
 
-                        {order.notes || 'No notes available'}
+                    <form
+                        onSubmit={(e)=>{
 
-                    </p>
+                            e.preventDefault();
+
+
+                            router.patch(
+                                `/admin/service-orders/${order.id}/notes`,
+                                {
+                                    notes
+                                }
+                            );
+
+                        }}
+                    >
+
+
+                        <textarea
+                            value={notes}
+                            onChange={(e)=>
+                                setNotes(e.target.value)
+                            }
+                            className="
+                                border
+                                rounded-lg
+                                w-full
+                                p-3
+                                mb-3
+                            "
+                        />
+
+
+                        <button
+                            className="
+                                bg-blue-600
+                                text-white
+                                px-4
+                                py-2
+                                rounded-lg
+                            "
+                        >
+                            Save Notes
+                        </button>
+
+
+                    </form>
 
 
                 </div>
 
 
-
             </div>
+
+
+
 
 
             <div className="mt-6">
 
+
                 <Link
                     href={`/admin/service-orders/${order.id}/items/create`}
-                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                    className="
+                        bg-blue-600
+                        text-white
+                        px-4
+                        py-2
+                        rounded-lg
+                    "
                 >
                     Add Part
                 </Link>
 
+
             </div>
+
+
         </AdminLayout>
 
     );

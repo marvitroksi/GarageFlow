@@ -24,6 +24,10 @@ export default function AdminLayout({ children }) {
                         Vehicles
                     </Link>
 
+                    <Link href="/admin/appointments">
+                        Appoinments
+                    </Link>
+
                     <Link href="/admin/service-orders">
                         Service Orders
                     </Link>

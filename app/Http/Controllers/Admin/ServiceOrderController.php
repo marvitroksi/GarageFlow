@@ -8,6 +8,7 @@ use App\Models\Vehicle;
 use App\Models\InventoryItem;
 use App\Models\ServiceOrderItem;
 use App\Models\User;
+use App\Models\Appointment;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -94,7 +95,8 @@ class ServiceOrderController extends Controller
         ]);
 
         return Inertia::render('Admin/ShowServiceOrder', [
-            'order' => $serviceOrder
+            'order' => $serviceOrder,
+            'mechanics' => User::where('role', 'mechanic')->get()
         ]);
     }
 
@@ -275,10 +277,76 @@ class ServiceOrderController extends Controller
         ]);
 
 
+        // Update related appointment status
+        if ($request->status === 'completed') {
+
+            Appointment::where('service_order_id', $serviceOrder->id)
+                ->update([
+                    'status' => 'completed'
+                ]);
+
+        }
+
+
         return back()
             ->with(
                 'success',
                 'Service order status updated.'
             );
+    }
+
+    public function updateLaborCost(Request $request, ServiceOrder $serviceOrder)
+    {
+        $request->validate([
+            'labor_cost' => 'required|numeric|min:0'
+        ]);
+
+        $serviceOrder->update([
+            'labor_cost' => $request->labor_cost
+        ]);
+
+        return back()->with(
+            'success',
+            'Labor cost updated.'
+        );
+    }
+
+    public function updateMechanic(Request $request, ServiceOrder $serviceOrder)
+    {
+        $request->validate([
+            'mechanic_id' => 'nullable|exists:users,id'
+        ]);
+
+        $serviceOrder->update([
+            'mechanic_id' => $request->mechanic_id
+        ]);
+
+        return back();
+    }
+
+    public function updateDescription(Request $request, ServiceOrder $serviceOrder)
+    {
+        $request->validate([
+            'description'=>'required|string'
+        ]);
+
+        $serviceOrder->update([
+            'description'=>$request->description
+        ]);
+
+        return back();
+    }
+
+    public function updateNotes(Request $request, ServiceOrder $serviceOrder)
+    {
+        $request->validate([
+            'notes'=>'nullable|string'
+        ]);
+
+        $serviceOrder->update([
+            'notes'=>$request->notes
+        ]);
+
+        return back();
     }
 }
