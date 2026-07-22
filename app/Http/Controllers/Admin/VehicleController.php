@@ -9,112 +9,233 @@ use App\Models\ServiceOrder;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
+
 class VehicleController extends Controller
 {
+
     public function index()
     {
+
         $vehicles = Vehicle::with('mechanic')->get();
 
+
         return Inertia::render('Admin/Vehicles', [
-            'vehicles' => $vehicles
+
+            'vehicles' => $vehicles,
+
+            'mechanics' =>
+                User::where('role', 'mechanic')->get()
+
         ]);
+
     }
+
+
+
+
+
 
 
     public function create()
     {
-        $mechanics = User::where('role', 'mechanic')->get();
 
         return Inertia::render('Admin/CreateVehicle', [
-            'mechanics' => $mechanics
+
+            'mechanics' =>
+                User::where('role', 'mechanic')->get()
+
         ]);
+
     }
+
+
+
+
+
 
 
     public function store(Request $request)
     {
+
         $request->validate([
-            'license_plate' => 'required|unique:vehicles',
-            'brand' => 'required',
-            'model' => 'required',
-            'year' => 'required',
-            'owner_name' => 'required',
-            'mechanic_id' => 'nullable',
-            'status' => 'required',
+
+            'license_plate' =>
+                'required|unique:vehicles,license_plate',
+
+            'brand' =>
+                'required|string',
+
+            'model' =>
+                'required|string',
+
+            'year' =>
+                'required',
+
+            'owner_name' =>
+                'required|string',
+
+            'mechanic_id' =>
+                'nullable|exists:users,id',
+
+            'status' =>
+                'required',
+
         ]);
+
 
 
         $vehicle = Vehicle::create([
-            'license_plate' => $request->license_plate,
-            'brand' => $request->brand,
-            'model' => $request->model,
-            'year' => $request->year,
-            'owner_name' => $request->owner_name,
-            'mechanic_id' => $request->mechanic_id,
-            'status' => $request->status,
+
+            'license_plate' =>
+                $request->license_plate,
+
+            'brand' =>
+                $request->brand,
+
+            'model' =>
+                $request->model,
+
+            'year' =>
+                $request->year,
+
+            'owner_name' =>
+                $request->owner_name,
+
+            'mechanic_id' =>
+                $request->mechanic_id,
+
+            'status' =>
+                $request->status,
+
         ]);
+
+
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Create initial service order
+        |--------------------------------------------------------------------------
+        */
+
 
         ServiceOrder::create([
 
-            'vehicle_id' => $vehicle->id,
+            'vehicle_id' =>
+                $vehicle->id,
 
-            'mechanic_id' => $vehicle->mechanic_id,
+            'mechanic_id' =>
+                $vehicle->mechanic_id,
 
-            'description' => 'Vehicle inspection pending',
+            'description' =>
+                'Vehicle inspection pending',
 
-            'status' => 'pending',
+            'status' =>
+                'pending',
 
-            'labor_cost' => 0,
+            'labor_cost' =>
+                0,
 
         ]);
 
 
-        return redirect()->route('admin.vehicles');
+
+
+
+        return redirect()
+
+            ->route('admin.vehicles');
+
     }
 
 
-    public function edit(Vehicle $vehicle)
-    {
-        $mechanics = User::where('role', 'mechanic')->get();
 
-        return Inertia::render('Admin/EditVehicle', [
-            'vehicle' => $vehicle,
-            'mechanics' => $mechanics,
-        ]);
-    }
+
+
 
 
     public function update(Request $request, Vehicle $vehicle)
     {
+
         $request->validate([
-            'license_plate' => 'required|unique:vehicles,license_plate,' . $vehicle->id,
-            'brand' => 'required',
-            'model' => 'required',
-            'year' => 'required',
-            'owner_name' => 'required',
-            'mechanic_id' => 'required',
-            'status' => 'required',
+
+            'license_plate' =>
+                'required|unique:vehicles,license_plate,' . $vehicle->id,
+
+            'brand' =>
+                'required|string',
+
+            'model' =>
+                'required|string',
+
+            'year' =>
+                'required',
+
+            'owner_name' =>
+                'required|string',
+
+            'mechanic_id' =>
+                'nullable|exists:users,id',
+
+            'status' =>
+                'required',
+
         ]);
+
+
+
 
 
         $vehicle->update([
-            'license_plate' => $request->license_plate,
-            'brand' => $request->brand,
-            'model' => $request->model,
-            'year' => $request->year,
-            'owner_name' => $request->owner_name,
-            'mechanic_id' => $request->mechanic_id,
-            'status' => $request->status,
+
+            'license_plate' =>
+                $request->license_plate,
+
+            'brand' =>
+                $request->brand,
+
+            'model' =>
+                $request->model,
+
+            'year' =>
+                $request->year,
+
+            'owner_name' =>
+                $request->owner_name,
+
+            'mechanic_id' =>
+                $request->mechanic_id,
+
+            'status' =>
+                $request->status,
+
         ]);
 
 
-        return redirect()->route('admin.vehicles');
+
+
+
+        return back();
+
     }
+
+
+
+
+
+
 
     public function destroy(Vehicle $vehicle)
     {
+
         $vehicle->delete();
 
-        return redirect()->route('admin.vehicles');
+
+        return redirect()
+
+            ->route('admin.vehicles');
+
     }
+
 }

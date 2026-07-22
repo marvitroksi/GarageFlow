@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 export default function PrimaryButton({
     children,
-    type = "button",
+    type = "submit",
     onClick,
     disabled = false,
     className = ""

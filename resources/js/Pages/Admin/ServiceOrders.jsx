@@ -2,11 +2,53 @@ import AdminLayout from '@/Layouts/AdminLayout';
 import { Link, router } from '@inertiajs/react';
 import { Eye, Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+import AnimatedCard from '@/Components/AnimatedCard';
+import PrimaryButton from '@/Components/PrimaryButton';
+import StatusBadge from '@/Components/StatusBadge';
 
 
-export default function ServiceOrders({ orders }) {
+export default function ServiceOrders({ orders, mechanics }) {
+
 
     const [search, setSearch] = useState('');
+
+    const [showEdit, setShowEdit] = useState(false);
+
+    const [selectedOrder, setSelectedOrder] = useState(null);
+
+
+    const [mechanicId, setMechanicId] = useState('');
+
+    const [status, setStatus] = useState('');
+
+    const [description, setDescription] = useState('');
+
+    const [laborCost, setLaborCost] = useState('');
+
+    const [notes, setNotes] = useState('');
+
+
+
+    function openEdit(order) {
+
+        setSelectedOrder(order);
+
+        setMechanicId(order.mechanic?.id ?? '');
+
+        setStatus(order.status);
+
+        setDescription(order.description);
+
+        setLaborCost(order.labor_cost);
+
+        setNotes(order.notes ?? '');
+
+        setShowEdit(true);
+
+    }
+
 
 
     function deleteOrder(id) {
@@ -19,16 +61,48 @@ export default function ServiceOrders({ orders }) {
 
     }
 
+
+
     function updateStatus(id, status) {
 
         router.patch(
             `/admin/service-orders/${id}/status`,
             {
-                status: status
+                status
             }
         );
 
     }
+
+
+
+
+    function saveEdit(e) {
+
+        e.preventDefault();
+
+
+        router.put(
+            `/admin/service-orders/${selectedOrder.id}`,
+            {
+                vehicle_id: selectedOrder.vehicle.id,
+                mechanic_id: mechanicId,
+                description,
+                status,
+                labor_cost: laborCost,
+                notes
+            },
+            {
+                onSuccess: () => {
+                    setShowEdit(false);
+                }
+            }
+        );
+
+    }
+
+
+
 
     const filteredOrders = orders.filter((order) =>
 
@@ -47,30 +121,28 @@ export default function ServiceOrders({ orders }) {
     );
 
 
+
     const sections = [
 
         {
             title: 'Pending / Waiting',
             orders: filteredOrders.filter(
-                (order) => order.status === 'pending'
-            ),
-            badge: 'bg-yellow-100 text-yellow-700'
+                (order)=>order.status === 'pending'
+            )
         },
 
         {
             title: 'In Progress',
             orders: filteredOrders.filter(
-                (order) => order.status === 'in_progress'
-            ),
-            badge: 'bg-blue-100 text-blue-700'
+                (order)=>order.status === 'in_progress'
+            )
         },
 
         {
             title: 'Completed',
             orders: filteredOrders.filter(
-                (order) => order.status === 'completed'
-            ),
-            badge: 'bg-green-100 text-green-700'
+                (order)=>order.status === 'completed'
+            )
         }
 
     ];
@@ -84,11 +156,9 @@ export default function ServiceOrders({ orders }) {
 
             <div className="flex justify-between items-center mb-6">
 
-
                 <h1 className="text-3xl font-bold">
                     Service Orders
                 </h1>
-
 
             </div>
 
@@ -96,14 +166,13 @@ export default function ServiceOrders({ orders }) {
 
             <div className="mb-6">
 
-
                 <input
 
                     type="text"
 
                     value={search}
 
-                    onChange={(e) => setSearch(e.target.value)}
+                    onChange={(e)=>setSearch(e.target.value)}
 
                     placeholder="Search by vehicle, mechanic, status..."
 
@@ -113,16 +182,13 @@ export default function ServiceOrders({ orders }) {
                         px-4
                         py-2
                         border
-                        rounded-lg
-                        focus:outline-none
-                        focus:ring-2
-                        focus:ring-blue-500
+                        rounded-xl
                     "
 
                 />
 
-
             </div>
+
 
 
 
@@ -130,7 +196,7 @@ export default function ServiceOrders({ orders }) {
             <div className="space-y-10">
 
 
-                {sections.map((section) => (
+                {sections.map((section)=>(
 
 
                     <div key={section.title}>
@@ -138,29 +204,20 @@ export default function ServiceOrders({ orders }) {
 
                         <div className="flex items-center gap-3 mb-4">
 
-
                             <h2 className="text-2xl font-bold">
-
                                 {section.title}
-
                             </h2>
 
 
-                            <span
-                                className={`
-                                    px-3
-                                    py-1
-                                    rounded-full
-                                    text-sm
-                                    font-medium
-                                    ${section.badge}
-                                `}
-                            >
-
+                            <span className="
+                                bg-gray-100
+                                px-3
+                                py-1
+                                rounded-full
+                                text-sm
+                            ">
                                 {section.orders.length}
-
                             </span>
-
 
                         </div>
 
@@ -170,23 +227,16 @@ export default function ServiceOrders({ orders }) {
 
                         {section.orders.length === 0 ? (
 
-
-                            <div className="bg-white rounded-lg shadow p-6">
-
+                            <AnimatedCard>
 
                                 <p className="text-gray-500">
-
                                     No orders in this category.
-
                                 </p>
 
-
-                            </div>
-
+                            </AnimatedCard>
 
 
                         ) : (
-
 
 
                             <div className="
@@ -198,23 +248,10 @@ export default function ServiceOrders({ orders }) {
                             ">
 
 
+                                {section.orders.map((order)=>(
 
-                                {section.orders.map((order) => (
 
-
-                                    <div
-
-                                        key={order.id}
-
-                                        className="
-                                            bg-white
-                                            rounded-lg
-                                            shadow
-                                            p-6
-                                        "
-
-                                    >
-
+                                    <AnimatedCard key={order.id}>
 
 
                                         <div className="flex justify-between items-start">
@@ -222,13 +259,10 @@ export default function ServiceOrders({ orders }) {
 
                                             <div>
 
-
                                                 <h3 className="text-xl font-bold">
 
                                                     {order.vehicle.brand}
-
                                                     {' '}
-
                                                     {order.vehicle.model}
 
                                                 </h3>
@@ -244,21 +278,7 @@ export default function ServiceOrders({ orders }) {
                                             </div>
 
 
-
-                                            <span
-                                                className={`
-                                                    px-3
-                                                    py-1
-                                                    rounded-full
-                                                    text-xs
-                                                    font-medium
-                                                    ${section.badge}
-                                                `}
-                                            >
-
-                                                {section.title}
-
-                                            </span>
+                                            <StatusBadge status={order.status}/>
 
 
                                         </div>
@@ -267,18 +287,16 @@ export default function ServiceOrders({ orders }) {
 
 
 
-                                        <div className="mt-5 space-y-2">
+                                        <div className="mt-5 space-y-3">
 
 
                                             <p>
 
                                                 <strong>
-                                                    Assigned Mechanic:
+                                                    Mechanic:
                                                 </strong>
 
-
                                                 {' '}
-
 
                                                 {order.mechanic
                                                     ? order.mechanic.name
@@ -294,9 +312,7 @@ export default function ServiceOrders({ orders }) {
                                                     Description:
                                                 </strong>
 
-
                                                 {' '}
-
 
                                                 {order.description}
 
@@ -311,9 +327,7 @@ export default function ServiceOrders({ orders }) {
                                                     Total:
                                                 </strong>
 
-
                                                 {' '}
-
 
                                                 €{Number(order.total_cost).toFixed(2)}
 
@@ -328,46 +342,51 @@ export default function ServiceOrders({ orders }) {
 
                                         <div className="flex items-center gap-3 mt-6 flex-wrap">
 
+
                                             {order.status === 'pending' && (
 
-                                                <button
-                                                    onClick={() =>
-                                                        updateStatus(order.id, 'in_progress')
+                                                <PrimaryButton
+
+                                                    onClick={()=>
+                                                        updateStatus(
+                                                            order.id,
+                                                            'in_progress'
+                                                        )
                                                     }
-                                                    className="
-                                                        bg-blue-600
-                                                        text-white
-                                                        px-3
-                                                        py-1
-                                                        rounded
-                                                        text-sm
-                                                    "
+
                                                 >
+
                                                     Start Repair
-                                                </button>
+
+                                                </PrimaryButton>
 
                                             )}
+
+
 
 
                                             {order.status === 'in_progress' && (
 
-                                                <button
-                                                    onClick={() =>
-                                                        updateStatus(order.id, 'completed')
+                                                <PrimaryButton
+
+                                                    onClick={()=>
+                                                        updateStatus(
+                                                            order.id,
+                                                            'completed'
+                                                        )
                                                     }
-                                                    className="
-                                                        bg-green-600
-                                                        text-white
-                                                        px-3
-                                                        py-1
-                                                        rounded
-                                                        text-sm
-                                                    "
+
                                                 >
+
                                                     Complete
-                                                </button>
+
+                                                </PrimaryButton>
 
                                             )}
+
+
+
+
 
                                             <Link
 
@@ -377,8 +396,6 @@ export default function ServiceOrders({ orders }) {
                                                     text-green-600
                                                     hover:text-green-800
                                                 "
-
-                                                title="View order"
 
                                             >
 
@@ -390,22 +407,22 @@ export default function ServiceOrders({ orders }) {
 
 
 
-                                            <Link
+                                            <button
 
-                                                href={`/admin/service-orders/${order.id}/edit`}
+                                                onClick={()=>
+                                                    openEdit(order)
+                                                }
 
                                                 className="
                                                     text-blue-600
                                                     hover:text-blue-800
                                                 "
 
-                                                title="Edit order"
-
                                             >
 
                                                 <Pencil size={20}/>
 
-                                            </Link>
+                                            </button>
 
 
 
@@ -413,14 +430,14 @@ export default function ServiceOrders({ orders }) {
 
                                             <button
 
-                                                onClick={() => deleteOrder(order.id)}
+                                                onClick={()=>
+                                                    deleteOrder(order.id)
+                                                }
 
                                                 className="
                                                     text-red-600
                                                     hover:text-red-800
                                                 "
-
-                                                title="Delete order"
 
                                             >
 
@@ -432,11 +449,10 @@ export default function ServiceOrders({ orders }) {
                                         </div>
 
 
-                                    </div>
+                                    </AnimatedCard>
 
 
                                 ))}
-
 
 
                             </div>
@@ -445,15 +461,284 @@ export default function ServiceOrders({ orders }) {
                         )}
 
 
-
                     </div>
 
 
                 ))}
 
 
-
             </div>
+
+
+
+
+
+
+            <AnimatePresence>
+
+
+                {showEdit && (
+
+
+                    <motion.div
+
+                        initial={{opacity:0}}
+
+                        animate={{opacity:1}}
+
+                        exit={{opacity:0}}
+
+                        className="
+                            fixed
+                            inset-0
+                            bg-black/40
+                            flex
+                            items-center
+                            justify-center
+                            z-50
+                        "
+
+                    >
+
+
+                        <motion.div
+
+                            initial={{
+                                scale:0.95,
+                                opacity:0,
+                                y:20
+                            }}
+
+                            animate={{
+                                scale:1,
+                                opacity:1,
+                                y:0
+                            }}
+
+                            exit={{
+                                scale:0.95,
+                                opacity:0,
+                                y:20
+                            }}
+
+                            className="
+                                bg-white
+                                rounded-2xl
+                                p-6
+                                w-full
+                                max-w-lg
+                            "
+
+                        >
+
+
+                            <h2 className="text-2xl font-bold mb-5">
+                                Edit Service Order
+                            </h2>
+
+
+
+                            <form
+                                onSubmit={saveEdit}
+                                className="space-y-4"
+                            >
+
+
+                                <select
+
+                                    value={mechanicId}
+
+                                    onChange={(e)=>
+                                        setMechanicId(e.target.value)
+                                    }
+
+                                    className="
+                                        border
+                                        rounded-xl
+                                        w-full
+                                        p-3
+                                    "
+
+                                >
+
+                                    <option value="">
+                                        Unassigned
+                                    </option>
+
+
+                                    {mechanics.map((mechanic)=>(
+
+                                        <option
+                                            key={mechanic.id}
+                                            value={mechanic.id}
+                                        >
+                                            {mechanic.name}
+                                        </option>
+
+                                    ))}
+
+
+                                </select>
+
+
+
+
+
+                                <select
+
+                                    value={status}
+
+                                    onChange={(e)=>
+                                        setStatus(e.target.value)
+                                    }
+
+                                    className="
+                                        border
+                                        rounded-xl
+                                        w-full
+                                        p-3
+                                    "
+
+                                >
+
+                                    <option value="pending">
+                                        Pending
+                                    </option>
+
+                                    <option value="in_progress">
+                                        In Progress
+                                    </option>
+
+                                    <option value="completed">
+                                        Completed
+                                    </option>
+
+
+                                </select>
+
+
+
+
+
+                                <textarea
+
+                                    value={description}
+
+                                    onChange={(e)=>
+                                        setDescription(e.target.value)
+                                    }
+
+                                    className="
+                                        border
+                                        rounded-xl
+                                        w-full
+                                        p-3
+                                    "
+
+                                />
+
+
+
+
+
+                                <input
+
+                                    type="number"
+
+                                    value={laborCost}
+
+                                    onChange={(e)=>
+                                        setLaborCost(e.target.value)
+                                    }
+
+                                    className="
+                                        border
+                                        rounded-xl
+                                        w-full
+                                        p-3
+                                    "
+
+                                    placeholder="Labor cost"
+
+                                />
+
+
+
+
+
+                                <textarea
+
+                                    value={notes}
+
+                                    onChange={(e)=>
+                                        setNotes(e.target.value)
+                                    }
+
+                                    className="
+                                        border
+                                        rounded-xl
+                                        w-full
+                                        p-3
+                                    "
+
+                                    placeholder="Notes"
+
+                                />
+
+
+
+
+
+                                <div className="flex justify-end gap-3">
+
+
+                                    <button
+
+                                        type="button"
+
+                                        onClick={()=>
+                                            setShowEdit(false)
+                                        }
+
+                                        className="
+                                            px-4
+                                            py-2
+                                            rounded-xl
+                                            bg-gray-200
+                                        "
+
+                                    >
+
+                                        Cancel
+
+                                    </button>
+
+
+
+
+                                    <PrimaryButton>
+
+                                        Save
+
+                                    </PrimaryButton>
+
+
+                                </div>
+
+
+                            </form>
+
+
+                        </motion.div>
+
+
+                    </motion.div>
+
+
+                )}
+
+
+            </AnimatePresence>
 
 
 

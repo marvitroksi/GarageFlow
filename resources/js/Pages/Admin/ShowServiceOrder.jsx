@@ -3,8 +3,8 @@ import { Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import AnimatedCard from '@/Components/AnimatedCard';
 import PrimaryButton from '@/Components/PrimaryButton';
-import StatusBadge from '@/Components/StatusBagde';
-import { motion } from "framer-motion"
+import StatusBadge from '@/Components/StatusBadge';
+import { motion, AnimatePresence } from "framer-motion"
 
 export default function ShowServiceOrder({ order, mechanics, inventoryItems }) {
 
@@ -572,167 +572,190 @@ export default function ShowServiceOrder({ order, mechanics, inventoryItems }) {
 
             </motion.div>
 
-            {showAddPart && (
+            <AnimatePresence>
 
-            <div className="
-                fixed
-                inset-0
-                bg-black/40
-                flex
-                items-center
-                justify-center
-                z-50
-            ">
+                {showAddPart && (
 
+                    <motion.div
 
-                <div className="
-                    bg-white
-                    rounded-2xl
-                    p-6
-                    w-full
-                    max-w-md
-                    shadow-xl
-                ">
+                        initial={{ opacity: 0 }}
 
+                        animate={{ opacity: 1 }}
 
-                    <h2 className="text-xl font-bold mb-5">
-                        Add Part
-                    </h2>
-
-
-
-                    <select
-
-                        value={selectedPart}
-
-                        onChange={(e)=>
-                            setSelectedPart(e.target.value)
-                        }
+                        exit={{ opacity: 0 }}
 
                         className="
-                            border
-                            rounded-xl
-                            w-full
-                            p-3
-                            mb-4
+                            fixed
+                            inset-0
+                            bg-black/40
+                            flex
+                            items-center
+                            justify-center
+                            z-50
                         "
 
                     >
 
-                        <option value="">
-                            Select part
-                        </option>
+                        <motion.div
 
+                            initial={{
+                                scale: 0.95,
+                                opacity: 0,
+                                y: 20
+                            }}
 
-                        {inventoryItems.map((item)=>(
+                            animate={{
+                                scale: 1,
+                                opacity: 1,
+                                y: 0
+                            }}
 
-                            <option
-                                key={item.id}
-                                value={item.id}
-                            >
+                            exit={{
+                                scale: 0.95,
+                                opacity: 0,
+                                y: 20
+                            }}
 
-                                {item.name}
-                                {' '}
-                                (Stock: {item.quantity})
-
-                            </option>
-
-                        ))}
-
-
-                    </select>
-
-
-
-                    <input
-
-                        type="number"
-
-                        min="1"
-
-                        value={quantity}
-
-                        onChange={(e)=>
-                            setQuantity(e.target.value)
-                        }
-
-                        className="
-                            border
-                            rounded-xl
-                            w-full
-                            p-3
-                            mb-5
-                        "
-
-                    />
-
-
-
-                    <div className="flex justify-end gap-3">
-
-
-                        <button
-
-                            onClick={()=>
-                                setShowAddPart(false)
-                            }
-
-                            className="
-                                px-4
-                                py-2
-                                rounded-xl
-                                bg-gray-200
-                            "
-
-                        >
-
-                            Cancel
-
-                        </button>
-
-
-
-                        <button
-
-                            onClick={()=>{
-
-                                router.post(
-                                    `/admin/service-orders/${order.id}/items`,
-                                    {
-                                        inventory_item_id:selectedPart,
-                                        quantity
-                                    }
-                                );
-
-
-                                setShowAddPart(false);
-
+                            transition={{
+                                duration: 0.2
                             }}
 
                             className="
-                                px-4
-                                py-2
-                                rounded-xl
-                                bg-blue-600
-                                text-white
+                                bg-white
+                                rounded-2xl
+                                p-6
+                                w-full
+                                max-w-md
+                                shadow-xl
                             "
 
                         >
 
-                            Add
+                            <h2 className="text-xl font-bold mb-5">
+                                Add Part
+                            </h2>
 
-                        </button>
+                            <select
 
+                                value={selectedPart}
 
-                    </div>
+                                onChange={(e)=>
+                                    setSelectedPart(e.target.value)
+                                }
 
+                                className="
+                                    border
+                                    rounded-xl
+                                    w-full
+                                    p-3
+                                    mb-4
+                                "
 
-                </div>
+                            >
 
+                                <option value="">
+                                    Select part
+                                </option>
 
-            </div>
+                                {inventoryItems.map((item)=>(
 
-            )}
+                                    <option
+                                        key={item.id}
+                                        value={item.id}
+                                    >
+
+                                        {item.name}
+                                        {' '}
+                                        (Stock: {item.quantity})
+
+                                    </option>
+
+                                ))}
+
+                            </select>
+
+                            <input
+
+                                type="number"
+
+                                min="1"
+
+                                value={quantity}
+
+                                onChange={(e)=>
+                                    setQuantity(e.target.value)
+                                }
+
+                                className="
+                                    border
+                                    rounded-xl
+                                    w-full
+                                    p-3
+                                    mb-5
+                                "
+
+                            />
+
+                            <div className="flex justify-end gap-3">
+
+                                <button
+
+                                    onClick={()=>
+                                        setShowAddPart(false)
+                                    }
+
+                                    className="
+                                        px-4
+                                        py-2
+                                        rounded-xl
+                                        bg-gray-200
+                                    "
+
+                                >
+
+                                    Cancel
+
+                                </button>
+
+                                <button
+
+                                    onClick={()=>{
+
+                                        router.post(
+                                            `/admin/service-orders/${order.id}/items`,
+                                            {
+                                                inventory_item_id: selectedPart,
+                                                quantity
+                                            }
+                                        );
+
+                                        setShowAddPart(false);
+
+                                    }}
+
+                                    className="
+                                        px-4
+                                        py-2
+                                        rounded-xl
+                                        bg-blue-600
+                                        text-white
+                                    "
+
+                                >
+
+                                    Add
+
+                                </button>
+
+                            </div>
+
+                        </motion.div>
+
+                    </motion.div>
+
+                )}
+
+                </AnimatePresence>
 
         </AdminLayout>
 

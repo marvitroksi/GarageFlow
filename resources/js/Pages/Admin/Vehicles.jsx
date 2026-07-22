@@ -1,193 +1,811 @@
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Link, router } from '@inertiajs/react';
-import { Pencil, Trash2 } from 'lucide-react';
+import { router } from '@inertiajs/react';
+import { Pencil, Trash2, Plus } from 'lucide-react';
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-export default function Vehicles({ vehicles }) {
+import AnimatedCard from '@/Components/AnimatedCard';
+import PrimaryButton from '@/Components/PrimaryButton';
+import StatusBadge from '@/Components/StatusBadge';
+
+
+export default function Vehicles({ vehicles, mechanics }) {
+
 
     const [search, setSearch] = useState('');
 
-    function handleDelete(id) {
+    const [showModal, setShowModal] = useState(false);
 
-        if(confirm('Are you sure you want to delete this vehicle?')) {
+    const [editingVehicle, setEditingVehicle] = useState(null);
 
-            router.delete(`/admin/vehicles/${id}`);
 
-        }
+    const emptyForm = {
+
+        license_plate:'',
+        brand:'',
+        model:'',
+        year:'',
+        owner_name:'',
+        mechanic_id:'',
+        status:'waiting'
+
+    };
+
+
+    const [form, setForm] = useState(emptyForm);
+
+
+
+    function openCreate(){
+
+        setEditingVehicle(null);
+
+        setForm(emptyForm);
+
+        setShowModal(true);
 
     }
 
-    const filteredVehicles = vehicles.filter((vehicle) =>
-        vehicle.license_plate.toLowerCase().includes(search.toLowerCase()) ||
-        vehicle.brand.toLowerCase().includes(search.toLowerCase()) ||
-        vehicle.model.toLowerCase().includes(search.toLowerCase()) ||
-        vehicle.owner_name.toLowerCase().includes(search.toLowerCase())
+
+
+
+    function openEdit(vehicle){
+
+        setEditingVehicle(vehicle);
+
+
+        setForm({
+
+            license_plate: vehicle.license_plate,
+            brand: vehicle.brand,
+            model: vehicle.model,
+            year: vehicle.year,
+            owner_name: vehicle.owner_name,
+            mechanic_id: vehicle.mechanic_id ?? '',
+            status: vehicle.status
+
+        });
+
+
+        setShowModal(true);
+
+    }
+
+
+
+
+
+    function saveVehicle(e){
+
+        e.preventDefault();
+
+
+        if(editingVehicle){
+
+
+            router.put(
+                `/admin/vehicles/${editingVehicle.id}`,
+                form
+            );
+
+
+        }else{
+
+
+            router.post(
+                '/admin/vehicles',
+                form
+            );
+
+
+        }
+
+
+        setShowModal(false);
+
+    }
+
+
+
+
+
+    function deleteVehicle(id){
+
+
+        if(confirm('Delete this vehicle?')){
+
+
+            router.delete(
+                `/admin/vehicles/${id}`
+            );
+
+
+        }
+
+
+    }
+
+
+
+
+
+    const filteredVehicles = vehicles.filter((vehicle)=>
+
+        vehicle.license_plate
+            .toLowerCase()
+            .includes(search.toLowerCase())
+
+        ||
+
+        vehicle.brand
+            .toLowerCase()
+            .includes(search.toLowerCase())
+
+        ||
+
+        vehicle.model
+            .toLowerCase()
+            .includes(search.toLowerCase())
+
+        ||
+
+        vehicle.owner_name
+            .toLowerCase()
+            .includes(search.toLowerCase())
+
     );
+
+
+
+
+
     return (
 
         <AdminLayout>
 
-            <div className="flex justify-between items-center mb-6">
 
-                <h1 className="text-3xl font-bold">
+
+            <div className="
+                flex
+                justify-between
+                items-center
+                mb-6
+            ">
+
+
+                <h1 className="
+                    text-3xl
+                    font-bold
+                ">
                     Vehicles
                 </h1>
 
-                <Link
-                    href="/admin/vehicles/create"
-                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+
+
+
+                <PrimaryButton
+                    onClick={openCreate}
                 >
+
+                    <Plus size={18}/>
+
                     Add Vehicle
-                </Link>
+
+                </PrimaryButton>
+
+
 
             </div>
 
-            <div className="mb-6">
 
-                <input
-                    type="text"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Search by plate, brand, model or owner..."
-                    className="
-                        w-full
-                        md:w-1/3
-                        px-4
-                        py-2
-                        border
-                        rounded-lg
-                        focus:outline-none
-                        focus:ring-2
-                        focus:ring-blue-500
-                    "
-                />
 
-            </div>
 
-            <div className="bg-white p-6 rounded-lg shadow">
 
-                <h2 className="text-xl font-semibold mb-4">
-                    Vehicles
-                </h2>
 
-                {filteredVehicles.length === 0 ? (
+            <AnimatedCard>
 
-                    <div className="text-center py-10">
 
-                        <p className="text-gray-500 text-lg mb-4">
-                            No vehicles found.
-                        </p>
+                <div className="mb-6">
 
-                        <Link
-                             href="/admin/vehicles/create"
-                            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                        >
-                                Add your first vehicle
-                        </Link>
 
-                    </div>
+                    <input
 
-                ) : (
+                        type="text"
 
-                    <div className="overflow-x-auto">
+                        value={search}
 
-                        <table className="min-w-full border-collapse">
+                        onChange={(e)=>
+                            setSearch(e.target.value)
+                        }
 
-                            <thead>
+                        placeholder="
+                            Search plate, brand, model or owner...
+                        "
 
-                                <tr className="border-b">
+                        className="
+                            w-full
+                            md:w-1/3
+                            border
+                            rounded-xl
+                            px-4
+                            py-2
+                        "
 
-                                    <th className="text-left py-3 px-4">Plate</th>
-                                    <th className="text-left py-3 px-4">Vehicle</th>
-                                    <th className="text-left py-3 px-4">Owner</th>
-                                    <th className="text-left py-3 px-4">Mechanic</th>
-                                    <th className="text-left py-3 px-4">Status</th>
-                                    <th className="text-center py-3 px-4">Actions</th>
+                    />
 
-                                </tr>
 
-                            </thead>
+                </div>
 
-                            <tbody>
 
-                                {filteredVehicles.map((vehicle) => (
 
-                                    <tr
+
+                <div className="
+                    overflow-x-auto
+                ">
+
+
+                    <table className="
+                        min-w-full
+                    ">
+
+
+                        <thead>
+
+
+                            <tr className="
+                                bg-gray-50
+                                border-b
+                            ">
+
+
+                                <th className="px-4 py-3 text-left">
+                                    Plate
+                                </th>
+
+
+                                <th className="px-4 py-3 text-left">
+                                    Vehicle
+                                </th>
+
+
+                                <th className="px-4 py-3 text-left">
+                                    Owner
+                                </th>
+
+
+                                <th className="px-4 py-3 text-left">
+                                    Mechanic
+                                </th>
+
+
+                                <th className="px-4 py-3 text-left">
+                                    Status
+                                </th>
+
+
+                                <th className="px-4 py-3 text-center">
+                                    Actions
+                                </th>
+
+
+                            </tr>
+
+
+                        </thead>
+
+
+
+
+
+                        <tbody>
+
+
+                            <AnimatePresence>
+
+
+                                {filteredVehicles.map((vehicle)=>(
+
+
+                                    <motion.tr
+
                                         key={vehicle.id}
-                                        className="border-b hover:bg-gray-50"
+
+                                        initial={{
+                                            opacity:0,
+                                            y:10
+                                        }}
+
+                                        animate={{
+                                            opacity:1,
+                                            y:0
+                                        }}
+
+                                        exit={{
+                                            opacity:0
+                                        }}
+
+                                        transition={{
+                                            duration:0.2
+                                        }}
+
+                                        className="
+                                            border-b
+                                            hover:bg-gray-50
+                                        "
+
                                     >
 
-                                        <td className="py-3 px-4">
+
+                                        <td className="px-4 py-3">
+
                                             {vehicle.license_plate}
+
                                         </td>
 
-                                        <td className="py-3 px-4">
-                                            {vehicle.brand} {vehicle.model}
+
+                                        <td className="px-4 py-3 font-medium">
+
+                                            {vehicle.brand}
+
+                                            {' '}
+
+                                            {vehicle.model}
+
                                         </td>
 
-                                        <td className="py-3 px-4">
+
+                                        <td className="px-4 py-3">
+
                                             {vehicle.owner_name}
+
                                         </td>
 
-                                        <td className="py-3 px-4">
-                                            {vehicle.mechanic?.name ?? 'Unassigned'}
+                                        <td className="px-4 py-3">
+
+                                            {
+                                                vehicle.mechanic
+                                                    ? vehicle.mechanic.name
+                                                    : 'Unassigned'
+                                            }
+
                                         </td>
 
-                                        <td className="py-3 px-4">
+
+
+
+
+                                        <td className="px-4 py-3">
 
                                             <span
-                                                className={`px-3 py-1 rounded-full text-sm font-medium ${
-                                                    vehicle.status === 'waiting'
+                                                className={`
+                                                    px-3
+                                                    py-1
+                                                    rounded-full
+                                                    text-sm
+                                                    font-medium
+
+                                                    ${
+                                                        vehicle.status === 'waiting'
+
                                                         ? 'bg-yellow-100 text-yellow-700'
+
                                                         : vehicle.status === 'repairing'
+
                                                         ? 'bg-blue-100 text-blue-700'
+
                                                         : 'bg-green-100 text-green-700'
-                                                    }`}
+                                                    }
+                                                `}
                                             >
-                                                {vehicle.status.charAt(0).toUpperCase() + vehicle.status.slice(1)}
+
+                                                {
+                                                    vehicle.status
+                                                        .charAt(0)
+                                                        .toUpperCase()
+                                                    +
+                                                    vehicle.status.slice(1)
+                                                }
+
                                             </span>
+
 
                                         </td>
 
-                                        <td className="py-3 px-4">
 
-                                            <div className="flex justify-center items-center gap-4">
 
-                                                <Link
-                                                    href={`/admin/vehicles/${vehicle.id}/edit`}
-                                                    className="p-2 rounded hover:bg-blue-100 text-blue-600"
-                                                    title="Edit vehicle"
-                                                >
-                                                    <Pencil size={18} />
-                                                </Link>
-                                                
+
+
+                                        <td className="px-4 py-3">
+
+
+                                            <div className="
+                                                flex
+                                                justify-center
+                                                gap-3
+                                            ">
+
+
 
                                                 <button
-                                                    onClick={() => handleDelete(vehicle.id)}
-                                                    className="p-2 rounded hover:bg-red-100 text-red-600"
-                                                    title="Delete vehicle"
+
+                                                    onClick={()=>
+                                                        openEdit(vehicle)
+                                                    }
+
+                                                    className="
+                                                        p-2
+                                                        rounded-xl
+                                                        text-blue-600
+                                                        hover:bg-blue-100
+                                                    "
+
+                                                    title="Edit vehicle"
+
                                                 >
-                                                    <Trash2 size={18} />
+
+                                                    <Pencil size={18}/>
+
                                                 </button>
+
+
+
+
+
+                                                <button
+
+                                                    onClick={()=>
+                                                        deleteVehicle(vehicle.id)
+                                                    }
+
+                                                    className="
+                                                        p-2
+                                                        rounded-xl
+                                                        text-red-600
+                                                        hover:bg-red-100
+                                                    "
+
+                                                    title="Delete vehicle"
+
+                                                >
+
+                                                    <Trash2 size={18}/>
+
+                                                </button>
+
+
 
                                             </div>
 
+
                                         </td>
 
-                                    </tr>
+
+
+                                    </motion.tr>
+
 
                                 ))}
 
-                            </tbody>
 
-                        </table>
+                            </AnimatePresence>
 
-                    </div>
+
+                        </tbody>
+
+
+                    </table>
+
+
+                </div>
+
+
+            </AnimatedCard>
+
+
+
+
+
+
+
+
+
+            <AnimatePresence>
+
+
+                {showModal && (
+
+
+                    <motion.div
+
+                        initial={{
+                            opacity:0
+                        }}
+
+                        animate={{
+                            opacity:1
+                        }}
+
+                        exit={{
+                            opacity:0
+                        }}
+
+                        className="
+                            fixed
+                            inset-0
+                            bg-black/40
+                            flex
+                            items-center
+                            justify-center
+                            z-50
+                        "
+
+                    >
+
+
+
+                        <motion.div
+
+                            initial={{
+                                scale:0.95,
+                                opacity:0,
+                                y:20
+                            }}
+
+                            animate={{
+                                scale:1,
+                                opacity:1,
+                                y:0
+                            }}
+
+                            exit={{
+                                scale:0.95,
+                                opacity:0,
+                                y:20
+                            }}
+
+                            className="
+                                bg-white
+                                rounded-2xl
+                                p-6
+                                w-full
+                                max-w-lg
+                                shadow-xl
+                            "
+
+                        >
+
+
+
+                            <h2 className="
+                                text-2xl
+                                font-bold
+                                mb-5
+                            ">
+
+
+                                {
+                                    editingVehicle
+                                        ? 'Edit Vehicle'
+                                        : 'Add Vehicle'
+                                }
+
+
+                            </h2>
+
+
+
+
+
+                            <form
+                                onSubmit={saveVehicle}
+                                className="space-y-4"
+                            >
+
+
+
+                                {
+                                    [
+                                        ['license_plate','License Plate'],
+                                        ['brand','Brand'],
+                                        ['model','Model'],
+                                        ['year','Year'],
+                                        ['owner_name','Owner Name']
+                                    ]
+                                    .map(([key,placeholder])=>(
+
+
+                                        <input
+
+                                            key={key}
+
+                                            placeholder={placeholder}
+
+                                            value={form[key]}
+
+                                            onChange={(e)=>
+                                                setForm({
+                                                    ...form,
+                                                    [key]:e.target.value
+                                                })
+                                            }
+
+                                            className="
+                                                w-full
+                                                border
+                                                rounded-xl
+                                                p-3
+                                            "
+
+                                        />
+
+
+                                    ))
+                                }
+
+
+
+
+
+
+                                <select
+
+                                    value={form.mechanic_id}
+
+                                    onChange={(e)=>
+                                        setForm({
+                                            ...form,
+                                            mechanic_id:e.target.value
+                                        })
+                                    }
+
+                                    className="
+                                        w-full
+                                        border
+                                        rounded-xl
+                                        p-3
+                                    "
+
+                                >
+
+
+                                    <option value="">
+                                        Select mechanic
+                                    </option>
+
+
+                                    {mechanics.map((mechanic)=>(
+
+                                        <option
+                                            key={mechanic.id}
+                                            value={mechanic.id}
+                                        >
+
+                                            {mechanic.name}
+
+                                        </option>
+
+                                    ))}
+
+
+                                </select>
+
+
+
+
+
+
+                                <select
+
+                                    value={form.status}
+
+                                    onChange={(e)=>
+                                        setForm({
+                                            ...form,
+                                            status:e.target.value
+                                        })
+                                    }
+
+                                    className="
+                                        w-full
+                                        border
+                                        rounded-xl
+                                        p-3
+                                    "
+
+                                >
+
+
+                                    <option value="waiting">
+                                        Waiting
+                                    </option>
+
+
+                                    <option value="repairing">
+                                        Repairing
+                                    </option>
+
+
+                                    <option value="completed">
+                                        Completed
+                                    </option>
+
+
+                                </select>
+
+
+
+
+
+
+
+                                <div className="
+                                    flex
+                                    justify-end
+                                    gap-3
+                                    pt-4
+                                ">
+
+
+                                    <button
+
+                                        type="button"
+
+                                        onClick={()=>
+                                            setShowModal(false)
+                                        }
+
+                                        className="
+                                            px-4
+                                            py-2
+                                            rounded-xl
+                                            bg-gray-200
+                                        "
+
+                                    >
+
+                                        Cancel
+
+                                    </button>
+
+
+
+
+                                    <PrimaryButton>
+
+                                        Save
+
+                                    </PrimaryButton>
+
+
+
+                                </div>
+
+
+
+
+                            </form>
+
+
+
+
+                        </motion.div>
+
+
+
+                    </motion.div>
+
 
                 )}
 
-            </div>
+
+            </AnimatePresence>
+
+
+
+
 
         </AdminLayout>
+
     );
+
 }

@@ -25,6 +25,7 @@ class ServiceOrderController extends Controller
             'payments'
         ])->get();
 
+
         $orders->each(function ($order) {
 
             $partsCost = $order->items->sum(function ($item) {
@@ -33,321 +34,492 @@ class ServiceOrderController extends Controller
 
             });
 
-            $order->total_cost = $order->labor_cost + $partsCost;
+
+            $order->total_cost =
+                $order->labor_cost + $partsCost;
 
         });
 
 
+
         return Inertia::render('Admin/ServiceOrders', [
-            'orders' => $orders
+
+            'orders' => $orders,
+
+            'mechanics' =>
+                User::where('role', 'mechanic')->get()
+
         ]);
     }
+
+
+
+
 
 
 
     public function create()
     {
-        $vehicles = Vehicle::all();
-
-        $mechanics = User::where('role', 'mechanic')->get();
-
 
         return Inertia::render('Admin/CreateServiceOrder', [
-            'vehicles' => $vehicles,
-            'mechanics' => $mechanics
+
+            'vehicles' => Vehicle::all(),
+
+            'mechanics' =>
+                User::where('role', 'mechanic')->get()
+
         ]);
+
     }
+
+
+
+
+
+
 
     public function store(Request $request)
     {
 
         $request->validate([
 
-            'vehicle_id' => 'required',
-            'mechanic_id' => 'nullable',
-            'description' => 'required',
-            'status' => 'required',
-            'labor_cost' => 'required',
+            'vehicle_id' =>
+                'required|exists:vehicles,id',
+
+            'mechanic_id' =>
+                'nullable|exists:users,id',
+
+            'description' =>
+                'required|string',
+
+            'status' =>
+                'required',
+
+            'labor_cost' =>
+                'required|numeric|min:0',
 
         ]);
+
+
 
         ServiceOrder::create([
 
-            'vehicle_id' => $request->vehicle_id,
-            'mechanic_id' => $request->mechanic_id,
-            'description' => $request->description,
-            'status' => $request->status,
-            'labor_cost' => $request->labor_cost,
-            'notes' => $request->notes,
+            'vehicle_id' =>
+                $request->vehicle_id,
+
+            'mechanic_id' =>
+                $request->mechanic_id,
+
+            'description' =>
+                $request->description,
+
+            'status' =>
+                $request->status,
+
+            'labor_cost' =>
+                $request->labor_cost,
+
+            'notes' =>
+                $request->notes,
 
         ]);
 
-        return redirect()->route('admin.service-orders');
+
+
+        return redirect()
+            ->route('admin.service-orders');
 
     }
+
+
+
+
+
+
 
     public function show(ServiceOrder $serviceOrder)
     {
+
         $serviceOrder->load([
+
             'vehicle',
+
             'mechanic',
+
             'items.inventoryItem'
+
         ]);
+
+
 
         return Inertia::render('Admin/ShowServiceOrder', [
-            'order' => $serviceOrder,
-            'mechanics' => User::where('role', 'mechanic')->get(),
-            'inventoryItems' => InventoryItem::orderBy('name')->get()
+
+            'order' =>
+                $serviceOrder,
+
+            'mechanics' =>
+                User::where('role','mechanic')->get(),
+
+            'inventoryItems' =>
+                InventoryItem::orderBy('name')->get()
+
         ]);
+
     }
 
-    public function edit(ServiceOrder $serviceOrder)
-    {
-        return Inertia::render('Admin/EditServiceOrder', [
-            'order' => $serviceOrder,
-            'vehicles' => Vehicle::all(),
-            'mechanics' => User::where('role','mechanic')->get()
-        ]);
-    }
 
-    public function destroy(ServiceOrder $serviceOrder)
-    {
-        $serviceOrder->delete();
 
-        return redirect()->route('admin.service-orders');
-    }
+
+
+
 
     public function update(Request $request, ServiceOrder $serviceOrder)
     {
+
         $request->validate([
 
-            'vehicle_id' => 'required',
-            'mechanic_id' => 'nullable',
-            'description' => 'required',
-            'status' => 'required',
-            'labor_cost' => 'required',
+            'vehicle_id' =>
+                'required|exists:vehicles,id',
+
+            'mechanic_id' =>
+                'nullable|exists:users,id',
+
+            'description' =>
+                'required|string',
+
+            'status' =>
+                'required',
+
+            'labor_cost' =>
+                'required|numeric|min:0',
 
         ]);
+
 
 
         $serviceOrder->update([
 
-            'vehicle_id' => $request->vehicle_id,
-            'mechanic_id' => $request->mechanic_id,
-            'description' => $request->description,
-            'status' => $request->status,
-            'labor_cost' => $request->labor_cost,
-            'notes' => $request->notes,
+            'vehicle_id' =>
+                $request->vehicle_id,
+
+            'mechanic_id' =>
+                $request->mechanic_id,
+
+            'description' =>
+                $request->description,
+
+            'status' =>
+                $request->status,
+
+            'labor_cost' =>
+                $request->labor_cost,
+
+            'notes' =>
+                $request->notes,
 
         ]);
 
 
-        return redirect()->route('admin.service-orders');
+
+        return redirect()
+            ->route('admin.service-orders');
+
     }
 
-    public function createItem(ServiceOrder $serviceOrder)
+
+
+
+
+
+
+    public function destroy(ServiceOrder $serviceOrder)
     {
-        $inventoryItems = InventoryItem::orderBy('name')->get();
 
-        return Inertia::render('Admin/AddServiceOrderItem', [
-            'serviceOrder' => $serviceOrder,
-            'inventoryItems' => $inventoryItems,
-        ]);
+        $serviceOrder->delete();
+
+
+        return redirect()
+            ->route('admin.service-orders');
+
     }
+
+
+
+
+
+
 
     public function storeItem(Request $request, ServiceOrder $serviceOrder)
     {
+
         $request->validate([
-            'inventory_item_id' => 'required|exists:inventory_items,id',
-            'quantity' => 'required|integer|min:1',
+
+            'inventory_item_id' =>
+                'required|exists:inventory_items,id',
+
+            'quantity' =>
+                'required|integer|min:1',
+
         ]);
 
-        $item = InventoryItem::findOrFail($request->inventory_item_id);
 
-        if ($item->quantity < $request->quantity) {
+
+        $item = InventoryItem::findOrFail(
+            $request->inventory_item_id
+        );
+
+
+
+        if($item->quantity < $request->quantity){
+
             return back()->withErrors([
-                'quantity' => 'Not enough stock available.'
+
+                'quantity' =>
+                    'Not enough stock available.'
+
             ]);
+
         }
+
+
 
         ServiceOrderItem::create([
-            'service_order_id' => $serviceOrder->id,
-            'inventory_item_id' => $item->id,
-            'quantity' => $request->quantity,
-            'price' => $item->price,
-        ]);
 
-        $item->decrement('quantity', $request->quantity);
+            'service_order_id' =>
+                $serviceOrder->id,
 
-        return redirect()
-            ->route('admin.service-orders.show', $serviceOrder)
-            ->with('success', 'Part added successfully.');
-    }
+            'inventory_item_id' =>
+                $item->id,
 
-    public function editItem(ServiceOrderItem $item)
-    {
-        $item->load('inventoryItem', 'serviceOrder');
+            'quantity' =>
+                $request->quantity,
 
-        return Inertia::render('Admin/EditServiceOrderItem', [
-            'item' => $item,
-        ]);
-    }
+            'price' =>
+                $item->price,
 
-    public function updateItem(Request $request, ServiceOrderItem $item)
-    {
-        $request->validate([
-            'quantity' => 'required|integer|min:0',
         ]);
 
 
-        $oldQuantity = $item->quantity;
 
-        $newQuantity = $request->quantity;
+        $item->decrement(
+            'quantity',
+            $request->quantity
+        );
 
-
-        $difference = $newQuantity - $oldQuantity;
-
-
-        $inventoryItem = $item->inventoryItem;
-
-
-        // Increasing quantity
-        if ($difference > 0) {
-
-            if ($inventoryItem->quantity < $difference) {
-
-                return back()->withErrors([
-                    'quantity' => 'Not enough stock available.'
-                ]);
-
-            }
-
-            $inventoryItem->decrement(
-                'quantity',
-                $difference
-            );
-
-        }
-
-
-        // Decreasing quantity
-        if ($difference < 0) {
-
-            $inventoryItem->increment(
-                'quantity',
-                abs($difference)
-            );
-
-        }
-
-
-        // If quantity becomes zero, remove the entry
-        if ($newQuantity == 0) {
-
-            $item->delete();
-
-        } else {
-
-            $item->update([
-                'quantity' => $newQuantity,
-            ]);
-
-        }
 
 
         return redirect()
+
             ->route(
                 'admin.service-orders.show',
-                $item->serviceOrder
+                $serviceOrder
             )
+
             ->with(
                 'success',
-                'Part updated successfully.'
+                'Part added successfully.'
             );
+
     }
+
+
+
+
+
+
 
     public function updateStatus(Request $request, ServiceOrder $serviceOrder)
     {
+
         $request->validate([
-            'status' => 'required|in:pending,in_progress,completed'
+
+            'status' =>
+                'required|in:pending,in_progress,completed'
+
         ]);
+
 
 
         $serviceOrder->update([
-            'status' => $request->status
+
+            'status' =>
+                $request->status
+
         ]);
 
 
-        // Update related appointment status
-        if ($request->status === 'completed') {
 
-            Appointment::where('service_order_id', $serviceOrder->id)
-                ->update([
-                    'status' => 'completed'
-                ]);
+
+        if($request->status === 'in_progress'){
+
+
+            $serviceOrder->vehicle->update([
+
+                'status' =>
+                    'repairing'
+
+            ]);
 
         }
 
 
-        return back()
-            ->with(
-                'success',
-                'Service order status updated.'
-            );
+
+
+
+        if($request->status === 'completed'){
+
+
+            $serviceOrder->vehicle->update([
+
+                'status' =>
+                    'completed'
+
+            ]);
+
+
+
+            Appointment::where(
+                'service_order_id',
+                $serviceOrder->id
+            )
+            ->update([
+
+                'status' =>
+                    'completed'
+
+            ]);
+
+        }
+
+
+
+
+        return back();
+
     }
+
+
+
+
+
+
 
     public function updateLaborCost(Request $request, ServiceOrder $serviceOrder)
     {
+
         $request->validate([
-            'labor_cost' => 'required|numeric|min:0'
+
+            'labor_cost' =>
+                'required|numeric|min:0'
+
         ]);
+
+
 
         $serviceOrder->update([
-            'labor_cost' => $request->labor_cost
+
+            'labor_cost' =>
+                $request->labor_cost
+
         ]);
 
-        return back()->with(
-            'success',
-            'Labor cost updated.'
-        );
+
+
+        return back();
+
     }
+
+
+
+
+
+
 
     public function updateMechanic(Request $request, ServiceOrder $serviceOrder)
     {
+
         $request->validate([
-            'mechanic_id' => 'nullable|exists:users,id'
+
+            'mechanic_id' =>
+                'nullable|exists:users,id'
+
         ]);
+
+
 
         $serviceOrder->update([
-            'mechanic_id' => $request->mechanic_id
+
+            'mechanic_id' =>
+                $request->mechanic_id
+
         ]);
 
+
+
         return back();
+
     }
+
+
+
+
+
+
 
     public function updateDescription(Request $request, ServiceOrder $serviceOrder)
     {
+
         $request->validate([
-            'description'=>'required|string'
+
+            'description' =>
+                'required|string'
+
         ]);
+
+
 
         $serviceOrder->update([
-            'description'=>$request->description
+
+            'description' =>
+                $request->description
+
         ]);
 
+
+
         return back();
+
     }
+
+
+
+
+
+
 
     public function updateNotes(Request $request, ServiceOrder $serviceOrder)
     {
+
         $request->validate([
-            'notes'=>'nullable|string'
+
+            'notes' =>
+                'nullable|string'
+
         ]);
+
+
 
         $serviceOrder->update([
-            'notes'=>$request->notes
+
+            'notes' =>
+                $request->notes
+
         ]);
 
+
+
         return back();
+
     }
+
 }
