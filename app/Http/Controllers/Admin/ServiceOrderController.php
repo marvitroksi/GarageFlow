@@ -96,7 +96,8 @@ class ServiceOrderController extends Controller
 
         return Inertia::render('Admin/ShowServiceOrder', [
             'order' => $serviceOrder,
-            'mechanics' => User::where('role', 'mechanic')->get()
+            'mechanics' => User::where('role', 'mechanic')->get(),
+            'inventoryItems' => InventoryItem::orderBy('name')->get()
         ]);
     }
 
